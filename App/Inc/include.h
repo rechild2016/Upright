@@ -43,6 +43,7 @@
 #include  "Vcan_touch.h"        //´¥ÃþÇý¶¯
 
 #include "Gyro.h"
+#include "motor.h"
 
 
 #endif  //__INCLUDE_H__
