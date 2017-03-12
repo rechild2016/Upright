@@ -14,7 +14,7 @@ TraceBufferSize=0x00010000
 TraceStallIfFIFOFull=0x00000000
 TracePortSize=0x00000004
 [DebugChecksum]
-Checksum=627016395
+Checksum=441294121
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -50,7 +50,7 @@ mode=0
 Count=0
 [Aliases]
 A0=_ "C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Board\src\VCAN_LED.C" ""
-A1=_ "C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Chip\src\MK60_SysTick.c" ""
+A1=_ "C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Chip\src\MK60_SysTick.c" "E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\src\MK60_SysTick.c"
 A2=_ "C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Chip\src\MK60_port.c" "E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\src\MK60_port.c"
 A3=_ "C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Chip\src\MK60_uart.c" "E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\src\MK60_uart.c"
 A4=_ "C:\Users\cosmos\Desktop\三轴加速度和陀螺仪互补滤波拟合\App\main.c" "E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\App\main.c"

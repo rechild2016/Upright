@@ -10,6 +10,7 @@
 #define Gyro2   ADC1_DP0
 #define ANGLE   ADC0_SE18//PTE25
 
+void GyroInit();
 void AngleAcceleration_AD (uint16 *AdColle);
 void ReadSensorData();
 void Parameters_Init();

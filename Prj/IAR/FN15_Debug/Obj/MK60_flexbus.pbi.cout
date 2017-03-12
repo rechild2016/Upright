@@ -1,46 +1,46 @@
-"C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Chip\src\MK60_flexbus.c"
+"E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\src\MK60_flexbus.c"
 -std=c99
 -ferror-limit=100
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Prj\IAR\..\..\App
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\App
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Prj\IAR\..\..\App\Inc
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\App\Inc
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Prj\IAR\..\..\Board\Inc
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Board\Inc
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Prj\IAR\..\..\Chip\inc
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Chip\inc
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Prj\IAR\..\..\Chip\inc\IAR
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Chip\inc\IAR
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Prj\IAR\..\..\Chip\inc\kinetis
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Chip\inc\kinetis
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Prj\IAR\..\..\Lib\CMSIS\Inc
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Lib\CMSIS\Inc
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Prj\IAR\..\..\Lib\FatFs
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Lib\FatFs
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Prj\IAR\..\..\Lib\USB
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Lib\USB
 -I
 D:\IAR\arm\inc
 -I
 D:\IAR\arm\inc\c
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\App
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\App
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\App\Inc
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\App\Inc
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Board\Inc
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Board\Inc
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Chip\inc
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\inc
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Chip\inc\IAR
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\inc\IAR
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Chip\inc\kinetis
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\inc\kinetis
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Lib\CMSIS\Inc
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Lib\CMSIS\Inc
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Lib\FatFs
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Lib\FatFs
 -I
-C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Lib\USB
+E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Lib\USB
 -DDEBUG=1
 -DARM_MATH_CM4=1
 -DMK60F15=1
@@ -239,8 +239,8 @@ C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Lib\USB
 -D__IAR_COMPILERBASE__=594179
 -D_GOANNA=1
 -D__SIGNED_CHARS__=1
--D__DATE__="Oct 30 2016"
--D__TIME__="22:03:57"
+-D__DATE__="Mar 11 2017"
+-D__TIME__="20:08:52"
 -D__STDC__=1
 -D__STDC_VERSION__=199901L
 -D__STDC_HOSTED__=1

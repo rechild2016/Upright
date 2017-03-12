@@ -44,6 +44,8 @@
 
 #include "Gyro.h"
 #include "motor.h"
+#include "CarControl.h"
+#include "PID.h"
 
 
 #endif  //__INCLUDE_H__

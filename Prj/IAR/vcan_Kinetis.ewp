@@ -5721,6 +5721,9 @@
   <group>
     <name>App</name>
     <file>
+      <name>$PROJ_DIR$\..\..\App\CarControl.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\App\Gyro.c</name>
     </file>
     <file>
@@ -5740,6 +5743,9 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\App\motor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\App\PID.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\App\Inc\PORT_cfg.h</name>

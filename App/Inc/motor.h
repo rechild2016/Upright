@@ -39,8 +39,7 @@
 #define MOTOR_HZ    (20*1000)
 #endif
 
-#define Lmotor 0
-#define Rmotor 1
+
 
 
 typedef enum
@@ -52,6 +51,6 @@ typedef enum
 
 
 extern void motor_init();
-extern void motor_control(unsigned char ch,int speed);
+extern void motor_control(int Lspeed,int Rspeed);
 
 #endif

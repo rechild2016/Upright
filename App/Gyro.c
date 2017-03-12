@@ -1,10 +1,13 @@
 #include "common.h"
 #include "Gyro.h"
+#include "MK60_adc.h"
+
   float agnle_Lowpass =0.7;     //0.7较好跟踪加速度计    
   float Angle_dot_Lowpass =0.1;   //0.4
 
   float Acc_Smp;        //加速度数据
   float Gyro_Smp;       //陀螺仪数据
+  
   float Angle_Smp;        //角度采集
   float Angle_dot_Smp;  //角速度采集
   float Angle;         //角度
@@ -16,10 +19,19 @@
  extern uint16 gyro_init[6];
   
  
+ void GyroInit()
+ {
+    adc_init(XOUT);
+    adc_init(YOUT);
+    adc_init(ZOUT);
+    adc_init(Gyro1);         //角加速度  Angular1
+    adc_init(Gyro2);  
+    adc_init(ANGLE);
+ }
 void Parameters_Init()
 {      
-    Acc_Offset = 1100;        //给小了稳定后车前倾，大了后倾  1720  1890 ！！！！！！！！！！！！
-    Gyro_Offset = 900;      //一开始前倾而后逐渐恢复是因为陀螺仪中值大了，后倾则小了    ！！！！！
+    Acc_Offset = 1070;        //给小了稳定后车前倾，大了后倾  1720  1890 ！！！！！！！！！！！！
+    Gyro_Offset = 700;      //一开始前倾而后逐渐恢复是因为陀螺仪中值大了，后倾则小了    ！！！！！
    
     Acc_Smp = Acc_Offset;
     Gyro_Smp = Gyro_Offset;
