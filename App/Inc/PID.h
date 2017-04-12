@@ -1,7 +1,7 @@
 #ifndef __PID_H__
 #define __PID_H__
 
-typedef struct{
+typedef struct pid_t{
     float SetPoint;//设定目标值
     long SumError;//误差累计
     float Kp;

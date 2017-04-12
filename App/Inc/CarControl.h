@@ -21,4 +21,6 @@ typedef struct          //定义一个结构体，存储加速度和陀螺仪以及其他直立参数的值
 
 void CarInit();
 void Straigth();
+void EncoderLearn();
+void SpeedControl();
 #endif

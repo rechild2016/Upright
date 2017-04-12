@@ -30,8 +30,8 @@
  }
 void Parameters_Init()
 {      
-    Acc_Offset = 1070;        //给小了稳定后车前倾，大了后倾  1720  1890 ！！！！！！！！！！！！
-    Gyro_Offset = 700;      //一开始前倾而后逐渐恢复是因为陀螺仪中值大了，后倾则小了    ！！！！！
+    Acc_Offset = 1090;        //给小了稳定后车前倾，大了后倾  1720  1890 ！！！！！！！！！！！！
+    Gyro_Offset = 1680;      //一开始前倾而后逐渐恢复是因为陀螺仪中值大了，后倾则小了    ！！！！！
    
     Acc_Smp = Acc_Offset;
     Gyro_Smp = Gyro_Offset;
@@ -76,7 +76,7 @@ void ReadSensorData()
 float EX_Angle = 0;
 float EX_DeltaAngle = 0;
 float EX_GravityAdjustTime = 2.0;
-float EX_angle_k = 3.0;       //！！！！！！！！！！！！！
+float EX_angle_k = 1.0;       //！！！！！！！！！！！！！
 float EX_gyro_k = 0.03;  
 
 void Complement_Filter_Ex(float angle,float gyro)     //互补滤波的程序

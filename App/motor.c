@@ -3,9 +3,9 @@
 #include "MK60_FTM.h"
 #include "MK60_port.h"
 #include "MK60_gpio.h"
-//左电机死区105  右电机100
-#define LDeath 40
-#define RDeath 55
+//左电机死区90  右电机86
+#define LDeath 95               //易变
+#define RDeath 90
 
 void motor_init()
 {    

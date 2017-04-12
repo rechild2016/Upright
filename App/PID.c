@@ -39,7 +39,7 @@ float LocPID_Calc(float nextpoint, PID_t *sptr)
 {
     float iError, dError, iLocPid;
     iError = sptr->SetPoint - nextpoint;  //偏差
-    sptr->SumError += 0.01*iError;   //积分
+    sptr->SumError += iError;   //积分
     dError = iError - sptr->LastError;     //微分
     sptr->LastError = iError; 
     iLocPid = sptr->Kp * iError  //比例项
