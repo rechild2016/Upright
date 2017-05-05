@@ -5760,6 +5760,12 @@
       <name>$PROJ_DIR$\..\..\Board\src\VCAN_BMP.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\Board\src\VCAN_camera.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Board\src\VCAN_computer.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\Board\src\vcan_img2sd.c</name>
     </file>
     <file>

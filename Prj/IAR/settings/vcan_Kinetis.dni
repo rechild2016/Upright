@@ -1,3 +1,10 @@
+[DebugChecksum]
+Checksum=2016519218
+[Exceptions]
+StopOnUncaught=_ 0
+StopOnThrow=_ 0
+[CodeCoverage]
+Enabled=_ 0
 [Stack]
 FillEnabled=0
 OverflowWarningsEnabled=1
@@ -8,24 +15,17 @@ UseTrigger=1
 TriggerName=main
 LimitSize=0
 ByteLimit=50
+[CallStack]
+ShowArgs=0
+[Disassembly]
+MixedMode=1
 [JLinkDriver]
 CStepIntDis=_ 0
 TraceBufferSize=0x00010000
 TraceStallIfFIFOFull=0x00000000
 TracePortSize=0x00000004
-[DebugChecksum]
-Checksum=-1910252675
-[Exceptions]
-StopOnUncaught=_ 0
-StopOnThrow=_ 0
-[CodeCoverage]
-Enabled=_ 0
-[CallStack]
-ShowArgs=0
-[Disassembly]
-MixedMode=1
-[FlashMemory]
-FlashEraseSelection=0 1       
+[watch_formats]
+Fmt0={W}42:CarSpeed	0	1
 [Trace1]
 Enabled=0
 ShowSource=1
@@ -47,12 +47,8 @@ Exclusions=
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Count=0
+Bp0=_ 1 "EMUL_CODE" "{$PROJ_DIR$\..\..\App\main.c}.97.9" 0 0 1 "" 0 "" 0
+Count=1
 [Aliases]
-A0=_ "C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Board\src\VCAN_LED.C" ""
-A1=_ "C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Chip\src\MK60_SysTick.c" "E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\src\MK60_SysTick.c"
-A2=_ "C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Chip\src\MK60_port.c" "E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\src\MK60_port.c"
-A3=_ "C:\Users\cosmos\Desktop\LCD_三轴加速度和陀螺仪_液晶显示变量\Chip\src\MK60_uart.c" "E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\src\MK60_uart.c"
-A4=_ "C:\Users\cosmos\Desktop\三轴加速度和陀螺仪互补滤波拟合\App\main.c" "E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\App\main.c"
-Count=5
-SuppressDialog=1
+Count=0
+SuppressDialog=0

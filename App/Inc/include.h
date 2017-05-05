@@ -32,15 +32,16 @@
 #include  "VCAN_camera.h"       //摄像头总头文件
 #include  "VCAN_LCD.h"          //液晶总头文件
 #include  "ff.h"                //FatFs
-#include  "VCAN_TSL1401.h"      //线性CCD
+//#include  "VCAN_TSL1401.h"      //线性CCD
 #include  "VCAN_key_event.h"    //按键消息处理
 #include  "VCAN_NRF24L0_MSG.h"  //无线模块消息处理
 
-#include  "VCAN_BMP.h"          //BMP
-#include  "vcan_img2sd.h"       //存储图像到sd卡一个文件
-#include  "vcan_sd_app.h"       //SD卡应用（显示sd看上图片固件）
+//#include  "VCAN_BMP.h"          //BMP
+//#include  "vcan_img2sd.h"       //存储图像到sd卡一个文件
+//#include  "vcan_sd_app.h"       //SD卡应用（显示sd看上图片固件）
 
-#include  "Vcan_touch.h"        //触摸驱动
+//#include  "Vcan_touch.h"        //触摸驱动
+#include  "VCAN_computer.h"     //多功能调试助手
 
 #include "Gyro.h"
 #include "motor.h"

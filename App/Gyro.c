@@ -2,23 +2,24 @@
 #include "Gyro.h"
 #include "MK60_adc.h"
 
-  float agnle_Lowpass =0.7;     //0.7较好跟踪加速度计    
-  float Angle_dot_Lowpass =0.1;   //0.4
+#define agnle_Lowpass  0.7
+#define Angle_dot_Lowpass  0.1
+  //float agnle_Lowpass =0.7;     //0.7较好跟踪加速度计    
+  //float Angle_dot_Lowpass =0.1;   //0.4
 
   float Acc_Smp;        //加速度数据
   float Gyro_Smp;       //陀螺仪数据
   
-  float Angle_Smp;        //角度采集
+  float Angle_Smp;      //角度采集
   float Angle_dot_Smp;  //角速度采集
-  float Angle;         //角度
-  float Angle_dot;     //角速度
-  float Acc_Offset;		//加速度计偏移量
+  float Angle;          //角度
+  float Angle_dot;      //角速度
+  float Acc_Offset;     //加速度计偏移量
   float Gyro_Offset;	//陀螺仪偏移量
   
- extern uint16 acc_init[6];
- extern uint16 gyro_init[6];
+ extern uint16 acc_init[5];
+ extern uint16 gyro_init[5];
   
- 
  void GyroInit()
  {
     adc_init(XOUT);
@@ -30,8 +31,8 @@
  }
 void Parameters_Init()
 {      
-    Acc_Offset = 1090;        //给小了稳定后车前倾，大了后倾  1720  1890 ！！！！！！！！！！！！
-    Gyro_Offset = 1680;      //一开始前倾而后逐渐恢复是因为陀螺仪中值大了，后倾则小了    ！！！！！
+    Acc_Offset = 1085;        //给小了稳定后车后倾，大了前倾  1090 ！！！！！！！！！！！！
+    Gyro_Offset = 1710;      //1680    ！！！！！
    
     Acc_Smp = Acc_Offset;
     Gyro_Smp = Gyro_Offset;
@@ -77,7 +78,7 @@ float EX_Angle = 0;
 float EX_DeltaAngle = 0;
 float EX_GravityAdjustTime = 2.0;
 float EX_angle_k = 1.0;       //！！！！！！！！！！！！！
-float EX_gyro_k = 0.03;  
+float EX_gyro_k = 0.12;  
 
 void Complement_Filter_Ex(float angle,float gyro)     //互补滤波的程序
 {
@@ -86,5 +87,5 @@ void Complement_Filter_Ex(float angle,float gyro)     //互补滤波的程序
   Angle = EX_Angle;
   Angle_dot = gyro;
   EX_DeltaAngle = (angle - EX_Angle)/EX_GravityAdjustTime;
-  EX_Angle += (gyro+EX_DeltaAngle)*0.05;
+  EX_Angle += (-gyro+EX_DeltaAngle)*0.05;
 }

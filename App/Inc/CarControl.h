@@ -15,7 +15,9 @@ typedef struct          //定义一个结构体，存储加速度和陀螺仪以及其他直立参数的值
 	  float Car_Speed_Set;//速度设置
 	  float Kp_speed;//速度KP
 	  float Ki_speed;//速度KI
-	  int   Speed_PWM;//直立PWM
+	  int   Speed_PWM;//速度PWM
+          int   OldSpeed;
+          int   NewSpeed;
 	  
 }Car_Info_t;
 
