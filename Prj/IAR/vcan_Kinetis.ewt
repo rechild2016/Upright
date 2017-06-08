@@ -515,7 +515,13 @@
       <name>$PROJ_DIR$\..\..\App\Gyro.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\App\Image.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\App\main.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\App\map.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\App\MK60_conf.c</name>

@@ -1,46 +1,46 @@
-"E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\App\PID.c"
+"D:\VS程序\Freescale\2017光电直立\App\PID.c"
 -std=c99
 -ferror-limit=100
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\App
+D:\VS程序\Freescale\2017光电直立\Prj\IAR\..\..\App
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\App\Inc
+D:\VS程序\Freescale\2017光电直立\Prj\IAR\..\..\App\Inc
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Board\Inc
+D:\VS程序\Freescale\2017光电直立\Prj\IAR\..\..\Board\Inc
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Chip\inc
+D:\VS程序\Freescale\2017光电直立\Prj\IAR\..\..\Chip\inc
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Chip\inc\IAR
+D:\VS程序\Freescale\2017光电直立\Prj\IAR\..\..\Chip\inc\IAR
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Chip\inc\kinetis
+D:\VS程序\Freescale\2017光电直立\Prj\IAR\..\..\Chip\inc\kinetis
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Lib\CMSIS\Inc
+D:\VS程序\Freescale\2017光电直立\Prj\IAR\..\..\Lib\CMSIS\Inc
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Lib\FatFs
+D:\VS程序\Freescale\2017光电直立\Prj\IAR\..\..\Lib\FatFs
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Prj\IAR\..\..\Lib\USB
+D:\VS程序\Freescale\2017光电直立\Prj\IAR\..\..\Lib\USB
 -I
 D:\IAR\arm\inc
 -I
 D:\IAR\arm\inc\c
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\App
+D:\VS程序\Freescale\2017光电直立\App
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\App\Inc
+D:\VS程序\Freescale\2017光电直立\App\Inc
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Board\Inc
+D:\VS程序\Freescale\2017光电直立\Board\Inc
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\inc
+D:\VS程序\Freescale\2017光电直立\Chip\inc
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\inc\IAR
+D:\VS程序\Freescale\2017光电直立\Chip\inc\IAR
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Chip\inc\kinetis
+D:\VS程序\Freescale\2017光电直立\Chip\inc\kinetis
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Lib\CMSIS\Inc
+D:\VS程序\Freescale\2017光电直立\Lib\CMSIS\Inc
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Lib\FatFs
+D:\VS程序\Freescale\2017光电直立\Lib\FatFs
 -I
-E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Lib\USB
+D:\VS程序\Freescale\2017光电直立\Lib\USB
 -DDEBUG=1
 -DARM_MATH_CM4=1
 -DMK60F15=1
@@ -249,8 +249,8 @@ E:\文档库\ROBOT Lab\三轴加速度和陀螺仪互补滤波拟合\Lib\USB
 -D__IAR_COMPILERBASE__=594179
 -D_GOANNA=1
 -D__SIGNED_CHARS__=1
--D__DATE__="Apr 20 2017"
--D__TIME__="17:40:55"
+-D__DATE__="May 23 2017"
+-D__TIME__="09:14:57"
 -D__STDC__=1
 -D__STDC_VERSION__=199901L
 -D__STDC_HOSTED__=1

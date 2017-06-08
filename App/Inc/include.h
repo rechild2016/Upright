@@ -47,6 +47,8 @@
 #include "motor.h"
 #include "CarControl.h"
 #include "PID.h"
+#include "Image.h"
 
+void Correction(uint8* imgbuff);
 
 #endif  //__INCLUDE_H__

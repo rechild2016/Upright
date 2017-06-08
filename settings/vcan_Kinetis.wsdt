@@ -12,7 +12,7 @@
           
           
           
-        <Column0>216</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+        <Column0>124</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
       </Workspace>
       <Build>
         
@@ -20,32 +20,42 @@
         
         
       <ColumnWidth0>20</ColumnWidth0><ColumnWidth1>980</ColumnWidth1><ColumnWidth2>261</ColumnWidth2><ColumnWidth3>65</ColumnWidth3></Build>
+      <Debug-Log>
+        
+        
+      <ColumnWidth0>20</ColumnWidth0><ColumnWidth1>1307</ColumnWidth1></Debug-Log>
       <TerminalIO/>
-    <Select-Ambiguous-Definitions><ColumnWidth0>470</ColumnWidth0><ColumnWidth1>67</ColumnWidth1><ColumnWidth2>806</ColumnWidth2></Select-Ambiguous-Definitions></Static>
+    <Find-All-References><ColumnWidth0>470</ColumnWidth0><ColumnWidth1>67</ColumnWidth1><ColumnWidth2>806</ColumnWidth2></Find-All-References><Select-Ambiguous-Definitions><ColumnWidth0>470</ColumnWidth0><ColumnWidth1>67</ColumnWidth1><ColumnWidth2>806</ColumnWidth2></Select-Ambiguous-Definitions></Static>
     <Windows>
       
       
     <Wnd0>
         <Tabs>
           <Tab>
-            <Identity>TabID-11465-573</Identity>
+            <Identity>TabID-18813-3421</Identity>
             <TabName>Workspace</TabName>
             <Factory>Workspace</Factory>
             <Session>
               
-            <NodeDict><ExpandedNode>vcan_Kinetis</ExpandedNode><ExpandedNode>vcan_Kinetis/App</ExpandedNode><ExpandedNode>vcan_Kinetis/Board</ExpandedNode></NodeDict></Session>
+            <NodeDict><ExpandedNode>vcan_Kinetis</ExpandedNode><ExpandedNode>vcan_Kinetis/App</ExpandedNode></NodeDict></Session>
           </Tab>
         </Tabs>
         
       <SelectedTab>0</SelectedTab></Wnd0><Wnd1>
         <Tabs>
           <Tab>
-            <Identity>TabID-8851-622</Identity>
+            <Identity>TabID-16722-3460</Identity>
             <TabName>Build</TabName>
             <Factory>Build</Factory>
             <Session/>
           </Tab>
-        <Tab><Identity>TabID-19651-2220</Identity><TabName>Ambiguous Definitions</TabName><Factory>Select-Ambiguous-Definitions</Factory><Session/></Tab></Tabs>
+          <Tab>
+            <Identity>TabID-13083-5371</Identity>
+            <TabName>Debug Log</TabName>
+            <Factory>Debug-Log</Factory>
+            <Session/>
+          </Tab>
+        <Tab><Identity>TabID-29680-29237</Identity><TabName>References</TabName><Factory>Find-All-References</Factory><Session/></Tab><Tab><Identity>TabID-19862-29517</Identity><TabName>Ambiguous Definitions</TabName><Factory>Select-Ambiguous-Definitions</Factory><Session/></Tab></Tabs>
         
       <SelectedTab>0</SelectedTab></Wnd1></Windows>
     <Editor>
@@ -53,14 +63,14 @@
       
       
       
-    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Board\src\VCAN_OV7725_Eagle.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>79</YPos2><SelStart2>2565</SelStart2><SelEnd2>2565</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Board\inc\VCAN_camera.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>450</SelStart2><SelEnd2>450</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Board\inc\VCAN_OV7725_Eagle.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>514</SelStart2><SelEnd2>514</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Chip\src\MK60_uart.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>388</YPos2><SelStart2>13596</SelStart2><SelEnd2>13596</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Chip\src\MK60_SysTick.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>45</YPos2><SelStart2>1594</SelStart2><SelEnd2>1594</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\main.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>79</YPos2><SelStart2>2493</SelStart2><SelEnd2>2493</SelEnd2></Tab><ActiveTab>5</ActiveTab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\CarControl.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>21</YPos2><SelStart2>926</SelStart2><SelEnd2>926</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\Gyro.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>24</YPos2><SelStart2>837</SelStart2><SelEnd2>837</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\motor.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>171</SelStart2><SelEnd2>171</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\Inc\Image.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>222</SelStart2><SelEnd2>222</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\Image.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>103</YPos2><SelStart2>2583</SelStart2><SelEnd2>2583</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\main.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>92</YPos2><SelStart2>3794</SelStart2><SelEnd2>3794</SelEnd2></Tab><ActiveTab>5</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Board\src\VCAN_LCD.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>111</YPos2><SelStart2>1465</SelStart2><SelEnd2>1465</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Board\src\VCAN_OV7725_Eagle.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>111</YPos2><SelStart2>3507</SelStart2><SelEnd2>3507</SelEnd2></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
     <Positions>
       
       
       
       
       
-    <Top><Row0><Sizes><Toolbar-05E97128><key>iaridepm.enu1</key></Toolbar-05E97128></Sizes></Row0><Row1><Sizes/></Row1></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>536</Bottom><Right>307</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>146413</sizeHorzCX><sizeHorzCY>287770</sizeHorzCY><sizeVertCX>226208</sizeVertCX><sizeVertCY>774101</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>114</Bottom><Right>1368</Right><x>-2</x><y>-2</y><xscreen>1370</xscreen><yscreen>116</yscreen><sizeHorzCX>1002928</sizeHorzCX><sizeHorzCY>166906</sizeHorzCY><sizeVertCX>146413</sizeVertCX><sizeVertCY>287770</sizeVertCY></Rect></Wnd1></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+    <Top><Row0><Sizes><Toolbar-04EB7040><key>iaridepm.enu1</key></Toolbar-04EB7040></Sizes></Row0><Row1><Sizes/></Row1></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>513</Bottom><Right>198</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>146413</sizeHorzCX><sizeHorzCY>287770</sizeHorzCY><sizeVertCX>146413</sizeVertCX><sizeVertCY>741007</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>137</Bottom><Right>1368</Right><x>-2</x><y>-2</y><xscreen>1370</xscreen><yscreen>139</yscreen><sizeHorzCX>1002928</sizeHorzCX><sizeHorzCY>200000</sizeHorzCY><sizeVertCX>146413</sizeVertCX><sizeVertCY>287770</sizeVertCY></Rect></Wnd1></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
   </Desktop>
 </Workspace>
 
