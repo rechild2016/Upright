@@ -2,7 +2,7 @@
 #define __INCLUDE_H__
 
 #include  "common.h"
-
+#include "string.h"
 /*
  * Include 用户自定义的头文件
  */

@@ -7,7 +7,9 @@
 #define ImgMap(x,y) (imgbuff[(x)*10+(y)/8]>>(7-(y)%8))&0x01
 
 unsigned char ConGraph[Img_H][Img_W] = { 0 };//连通图
+uint8 IsConnect[Img_H]={0};
 uint8 ConNum[Img_H]={0};
+
 extern uint8 img[Img_H][Img_W];
 extern uint8 imgbuff[CAMERA_SIZE];
 
@@ -153,7 +155,7 @@ void DFS(int x,int y)//完成
     if (x<0 || x>=Img_H || y<0 || y>=Img_W)return;//避免出界
     if (ConGraph[x][y] != 0 ) return;//已经搜索过，跳出递归
     ConGraph[x][y] = 1;//标记连通
-    ConNum[x]=1;
+    IsConnect[x]=1;
     if (x > 0)//往上方搜 
     {
         if (ColConnect(img[x][y], img[x - 1][y]))
@@ -176,7 +178,9 @@ void DFS(int x,int y)//完成
     }
 }
 
-
+/***************************************
+    根据斜率寻找中点位置
+**************************************/
 int SlopeSearch(int *t,Point *Mid)
 {
     int x0, y0,x1,y1;//搜索的起点
@@ -263,7 +267,7 @@ int SlopeSearch(int *t,Point *Mid)
 int GetMidLine(Point *MidPoint)
 {
     int i,len;
-    uint8 x0, y0,x1,y1;//搜索的起点
+   // uint8 x0, y0,x1,y1;//搜索的起点
      //遍历最下方三行
     for ( i = 1; i <= 3; i++)
     {
@@ -274,7 +278,7 @@ int GetMidLine(Point *MidPoint)
     {
       SlopeSearch(&i, MidPoint);
       if (MidPoint[i].x < 0 || MidPoint[i].y < 0)break;  
-      if(ConNum[Img_H-1-i]==0)break;
+      if(IsConnect[Img_H-1-i]==0)break;
     }
     len = i;
     for (i = 10; i < len-2; i++)//简单的滤波 应该没什么卵用
@@ -288,28 +292,68 @@ int GetMidLine(Point *MidPoint)
     return len;
 }
 
+/****************************************
+  统计连每行有多少连通块
+  只统计个数，不判断中间是否出现非连通区
+****************************************/
+uint8 CountRow(int row)
+{
+  int num=0;
+  int i;
+  for(i=0;i<Img_W;i++)
+    if(ConGraph[row][i]==1)num++;
+  
+  return num;
+}
+
+/****************************************
+统计连通图中的信息
+每行有多少连通块
+****************************************/
+uint8 CountGraph(uint8* num)
+{
+  uint8 i,len;
+  
+  for(i=Img_H-1;i>0;i--)
+  {
+    num[i]=CountRow(i);
+    if(num[i]>0)len++;
+  }
+  return len;
+}
+
 int ImageProcess()//图像处理程序
 {
   int i,j;
-  int len=0,x0;
+  int len=0,x0=0;
   
-  Correction();           //校正图像存到img中 
+  for(i=0;i<Img_H;i++)
+    for(j=0;j<Img_W;j++)
+    img[i][j]=imgbuff[i*10+j];
+  //Correction();           //校正图像存到img中 
+  
   memset(ConGraph, 0, 600);
-  memset(ConNum,0,60);
+  memset(IsConnect,0,60);
+  memset(ConNum,0,sizeof(ConNum));
   
   //确定连通图
-  x0=CarpetSearch(Img_H - 1);
+  for(i=1;i<10;i++)
+  {
+    x0=CarpetSearch(Img_H - i);
+    if(x0>10 && x0<70)break;
+  }
+  
   DFS(59,(x0+7)/8);
-  x0=CarpetSearch(Img_H - 2);
-  DFS(59,(x0+7)/8);
-  for(i=0;i<60;i++)
+
+  len=CountGraph(ConNum);//统计每一行连通块个数以及行数
+  for(i=0;i<60;i++)//非连通区域填黑
   {
     for(j=0;j<10;j++)
     {
       if(ConGraph[i][j]==0)
         img[i][j]=0xff;  
 
-      imgbuff[i*10+j]=img[i][j];
+      imgbuff[i*10+j]=img[i][j];//把图更新到显示数组中
     }
   }
   len=GetMidLine(MidLine);
