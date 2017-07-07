@@ -1,20 +1,17 @@
 #include "common.h"
 #include "include.h"
 
- uint8 limit=85;
+ 
  uint16 acc_init[5];
  uint16 gyro_init[5];
  uint16 AngleAcceleArry[6];
- uint8 KeyFree=0;       //检测按键松开
- uint8 modle_key=0;
- uint8 LCDShowMode=0;
- 
+
+ uint8 limit=65;
  uint8 img[Img_H][Img_W];
  uint8 imgbuff[CAMERA_SIZE]={1};   
-
  int imglen;
  extern  Point  MidLine[Img_H];
- float var[6];
+
  int Lspeed,Rspeed;
  int Rpulse=0,Lpulse=0; //左右编码器
  int16 LPulseSum=0,RPulseSum=0;//编码器累积值
@@ -26,10 +23,20 @@
  float SpeedKp=4.0;     //速度PID   4
  float SpeedKi=0.05;     //  0.4
  float DirKp=3.5;        //方向PID
- float DirKd=1.5;
- int CarRate=55;  
+ float DirKd=0.8;
+ 
+ int CarRate=35;  
+ int HighSpeed=45;
+ int LowSpeed=30;
+ 
  signed int dirdiff[3]={0};
  float dir=0;
+ int dirref=40;//方向的标准值
+ 
+ float var[6];
+ uint8 KeyFree=0;       //检测按键松开
+ uint8 modle_key=0;
+ uint8 LCDShowMode=0;
  
  extern PID_t StraigthPID;      //直立PID
  extern PID_t SpeedPID;         //速度PID
@@ -100,7 +107,8 @@ void main()
     
     while(1)
     { 
-      /*var[0] = Car_Info.Speed_PWM;       //Car_Info.Acc_Smp;
+      /*//发送数据到上位机
+        var[0] = Car_Info.Speed_PWM;       //Car_Info.Acc_Smp;
         var[1] = CarSpeed;
         var[2]=SpeedPID.SetPoint;
         //var[2] = Angle_Smp;
@@ -111,21 +119,25 @@ void main()
         */
         
         gpio_set(PTC15,1);
-        camera_get_img();    //摄像头获取图像到imgbuff[CAMERA_SIZE]   //用时10ms
-        gpio_set(PTC15,0);   
-        imglen=ImageProcess();//图像处理程序
-
+        camera_get_img();       //摄像头获取图像到imgbuff[CAMERA_SIZE]   //用时10ms
+        //vcan_sendimg(imgbuff,CAMERA_SIZE);
+        imglen=ImageProcess();  //图像处理程序
+        gpio_set(PTC15,0); 
+        
         dirdiff[0]=0;
         dirdiff[1]=0;
-    
         for(i=1;i<imglen;i++)
         {
           midline[i].x=MidLine[imglen-i].x;
           midline[i].y=Img_H-(imglen-i);
-          dirdiff[i/20]+=(MidLine[imglen-i].x-40);
+          dirdiff[i/20]+=(MidLine[imglen-i].x-dirref);
         }
-        dir=(1.5*dirdiff[0]+0.5*dirdiff[1])/imglen;//确定方向PID参数
+        dir=(1.2*dirdiff[0]+0*dirdiff[1])/imglen;//确定方向PID参数
         
+        if(imglen==0)CarRate=0;
+        else CarRate=LowSpeed;
+        
+        //显示信息参数
        if(key_check(KEY_B) == KEY_DOWN)LCDShowMode=1;//修改显示的内容
        if(LCDShowMode)
        {
@@ -146,7 +158,7 @@ void main()
        }
        else{
          ParameterSet();//屏幕按键调参  
-         vcan_sendimg(imgbuff,CAMERA_SIZE);
+        // vcan_sendimg(imgbuff,CAMERA_SIZE);
        }
 
        
@@ -170,6 +182,8 @@ void PIT0_IRQHandler(void)//1ms进一次中断
     Straigth();//直立控制
     motor_control(Car_Info.Upright_PWM - Car_Info.Speed_PWM - Car_Info.DirPWM,
                   Car_Info.Upright_PWM - Car_Info.Speed_PWM + Car_Info.DirPWM);
+    //motor_control(Car_Info.Upright_PWM  - Car_Info.DirPWM,
+      //            Car_Info.Upright_PWM  + Car_Info.DirPWM);
    // motor_control(-Car_Info.Speed_PWM,-Car_Info.Speed_PWM);
   }  
   else if(PIT0InteruptEventCount==3)   //陀螺仪

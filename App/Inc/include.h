@@ -49,6 +49,6 @@
 #include "PID.h"
 #include "Image.h"
 
-void Correction(uint8* imgbuff);
+void Correction();
 
 #endif  //__INCLUDE_H__

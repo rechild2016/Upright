@@ -154,7 +154,7 @@ void DFS(int x,int y)//完成
     if (ConGraph[x][y] != 0 ) return;//已经搜索过，跳出递归
     ConGraph[x][y] = 1;//标记连通
     ConNum[x]=1;
-    if (x > 0)//往上方搜
+    if (x > 0)//往上方搜 
     {
         if (ColConnect(img[x][y], img[x - 1][y]))
             DFS(x - 1, y);
@@ -207,7 +207,7 @@ int SlopeSearch(int *t,Point *Mid)
     }
     else 
     {
-        if (x0 <x1 + 4 && x0>x1 - 4)//竖直向上，斜率为无穷 
+        if (x0 <x1 + 10 && x0>x1 - 10)//竖直向上，斜率为无穷 
         {//水平搜索
             for (i = x0 - 1; i >= 0; i--)//上边的交点
                 if (ImgMap(Img_H - y0, i) == 1)break;
@@ -287,27 +287,27 @@ int GetMidLine(Point *MidPoint)
     }
     return len;
 }
+
 int ImageProcess()//图像处理程序
 {
   int i,j;
   int len=0,x0;
   
-  for(i=0;i<60;i++)
-  {
-    for(j=0;j<10;j++)
-      img[i][j]=imgbuff[i*10+j];//转二维
-  }
-  x0=CarpetSearch(Img_H - 1);
-  
+  Correction();           //校正图像存到img中 
   memset(ConGraph, 0, 600);
   memset(ConNum,0,60);
-  DFS(59,(x0+7)/8);//确定连通图
+  
+  //确定连通图
+  x0=CarpetSearch(Img_H - 1);
+  DFS(59,(x0+7)/8);
+  x0=CarpetSearch(Img_H - 2);
+  DFS(59,(x0+7)/8);
   for(i=0;i<60;i++)
   {
     for(j=0;j<10;j++)
     {
       if(ConGraph[i][j]==0)
-        img[i][j]=0xff;
+        img[i][j]=0xff;  
 
       imgbuff[i*10+j]=img[i][j];
     }
