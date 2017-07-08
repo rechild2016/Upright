@@ -23,19 +23,19 @@
  float Upright_Kd[5]={8, 8.0, 5, 4, 0};      //   11.3 8  5  4  0
  float SpeedKp=4.5;     //速度PID   4
  float SpeedKi=0.12;     //  0.4
- float DirKp=0.9;        //方向PID
+ float DirKp=1.5;        //方向PID
  float DirKd=0.6;
- float DirKp2=1.2;
+ float DirKp2=2.3;
  
  int CarRate=35;  
  int HighSpeed=50;
  int LowSpeed=30;
  
  signed int dirdiff[3]={0};
- float dir=0;
+ float dir[3]={0};
  float dir_next=0;
  int dirref=46;//方向的标准值
- 
+ int dircounter=0;
  float var[6];
  uint8 KeyFree=0;       //检测按键松开
  uint8 modle_key=0;
@@ -129,24 +129,29 @@ void main()
         
         dirdiff[0]=0;
         dirdiff[1]=0;
-
+        dirdiff[2]=0;
         for(i=1;i<imglen;i++)
         {
           midline[i].x=MidLine[imglen-i].x;
           midline[i].y=Img_H-(imglen-i);
-          dirdiff[i/25]+=(MidLine[imglen-i].x-dirref);
+          dirdiff[i/20]+=(MidLine[imglen-i].x-dirref);
         }
-        //dir=dir_next;
-        dir=(1.2*dirdiff[0]+0.8*dirdiff[1])/20;//确定方向PID参数
+       
+        dir[0]=(1.5*dirdiff[0]+0.5*dirdiff[1])/20;      //确定方向PID参数
+        dir[1]=(0.5*dirdiff[0]+1.5*dirdiff[1])/20;
+        dir[2]=(0.8*dirdiff[1]+1.2*dirdiff[2])/20;
+        dircounter=0;
+        
         if(imglen<10)
         {
-          dir=0;
+          dir[0]=0;
           CarRate=0;
         }
         else CarRate=HighSpeed;
         
-        if(imglen<25)DirPID.Kp=DirKp2;
+        if(imglen<30)DirPID.Kp=DirKp2;
         else DirPID.Kp=DirKp;
+        
         //显示信息参数
        if(key_check(KEY_B) == KEY_DOWN)LCDShowMode=1;//修改显示的内容
        if(LCDShowMode)
@@ -222,10 +227,10 @@ void PIT0_IRQHandler(void)//1ms进一次中断
   }
   else if(PIT0InteruptEventCount==1)
   {
-    
-    Car_Info.DirPWM=(int )LocPID_Calc(dir,&DirPID);
-    //DirPeriod++;
-    //if(DirPeriod>2)DirPeriod=0;
+   
+     Car_Info.DirPWM=(int )LocPID_Calc(dir[dircounter],&DirPID); 
+     if(dircounter<2)
+       dircounter++;
   }
   else if(PIT0InteruptEventCount==0)
   {
