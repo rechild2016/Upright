@@ -32,11 +32,11 @@
         <item>500</item><item>20</item></col-widths>
         <DisasmHistory/>
         <PreferedWindows>
-          <Position>2</Position>
-          <ScreenPosX>0</ScreenPosX>
-          <ScreenPosY>0</ScreenPosY>
-          <Windows/>
-        </PreferedWindows>
+          
+          
+          
+          
+        <Position>2</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows/></PreferedWindows>
         
         
       <ShowCodeCoverage>1</ShowCodeCoverage><ShowInstrProfiling>1</ShowInstrProfiling></Disassembly>
@@ -53,7 +53,7 @@
       <StaticWatch>
         <expressions>
           
-        <item>imglen</item><item>Car_Info.DirPWM</item><item>DirPID.Kp</item><item>DirPID.Kd</item><item>dirdiff</item><item>Car_Info.Speed_PWM</item><item>Car_Info.Upright_PWM</item><item>SpeedPID.Kp</item><item>SpeedPID.Ki</item><item>SpeedPID.Kd</item><item>CarSpeed</item><item>CarRate</item><item>SpeedPID.SumError</item><item>Upright_Kp</item><item>Upright_Kd</item><item>(int)Angle</item><item>(int)SpeedControlPeriod</item><item>(int)SpeedChange</item><item>Car_Info.OldSpeed</item><item>SpeedKp</item><item>img</item><item>imgbuff</item><item>MidLine</item><item>ConNum</item><item>DirPID.Kp</item><item>DirPID.Kd</item><item>dir</item><item>Acc_Offset</item><item>ConGraph</item><item>IsConnect</item><item>lspeed</item><item>rspeed</item><item></item></expressions>
+        <item>imglen</item><item>Car_Info.DirPWM</item><item>DirPID.Kp</item><item>DirPID.Kd</item><item>Car_Info.Speed_PWM</item><item>Car_Info.Upright_PWM</item><item>SpeedPID.Kp</item><item>SpeedPID.Ki</item><item>SpeedPID.Kd</item><item>CarSpeed</item><item>CarRate</item><item>SpeedPID.SumError</item><item>Upright_Kp</item><item>Upright_Kd</item><item>(int)Angle</item><item>(int)SpeedControlPeriod</item><item>(int)SpeedChange</item><item>Car_Info.OldSpeed</item><item>SpeedKp</item><item>imgbuff</item><item>DirPID.Kp</item><item>DirPID.Kd</item><item>dir</item><item>Acc_Offset</item><item>lspeed</item><item>rspeed</item><item>ImageBuffer2</item><item>ImageBuffer2[0][86]</item><item>ImageBuffer1</item><item></item></expressions>
         <col-names>
           
           
@@ -89,7 +89,7 @@
           </Tab>
         </Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd0><Wnd1>
+      <SelectedTab>0</SelectedTab></Wnd0><Wnd2>
         <Tabs>
           <Tab>
             <Identity>TabID-244-5407</Identity>
@@ -101,20 +101,20 @@
           </Tab>
         </Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd1><Wnd3><Tabs><Tab><Identity>TabID-19646-23531</Identity><TabName>Live Watch</TabName><Factory>StaticWatch</Factory></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd3><Wnd4><Tabs><Tab><Identity>TabID-32150-30719</Identity><TabName>Disassembly</TabName><Factory>Disassembly</Factory><Session/></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd4></Windows>
+      <SelectedTab>0</SelectedTab></Wnd2><Wnd5><Tabs><Tab><Identity>TabID-19646-23531</Identity><TabName>Live Watch</TabName><Factory>StaticWatch</Factory></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd5><Wnd7><Tabs><Tab><Identity>TabID-13632-22156</Identity><TabName>Call Stack</TabName><Factory>CallStack</Factory></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd7></Windows>
     <Editor>
       
       
       
       
-    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\Gyro.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>24</YPos2><SelStart2>837</SelStart2><SelEnd2>837</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\motor.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>171</SelStart2><SelEnd2>171</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Board\src\VCAN_key.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>87</YPos2><SelStart2>2309</SelStart2><SelEnd2>2309</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\Inc\include.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>89</SelStart2><SelEnd2>89</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\Image.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>323</YPos2><SelStart2>8126</SelStart2><SelEnd2>8126</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\CarControl.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>75</SelStart2><SelEnd2>75</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\main.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>89</YPos2><SelStart2>2701</SelStart2><SelEnd2>2701</SelEnd2></Tab><ActiveTab>6</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Chip\inc\common.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>166</YPos2><SelStart2>0</SelStart2><SelEnd2>0</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\map.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>1799</XPos2><YPos2>76</YPos2><SelStart2>15387</SelStart2><SelEnd2>15387</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Board\src\VCAN_OV7725_Eagle.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>111</YPos2><SelStart2>3507</SelStart2><SelEnd2>3507</SelEnd2></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\Inc\Image.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>32</YPos2><SelStart2>889</SelStart2><SelEnd2>889</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\map.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>43</SelStart2><SelEnd2>43</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\main.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>104</YPos2><SelStart2>2823</SelStart2><SelEnd2>2823</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Board\src\VCAN_LCD.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>369</YPos2><SelStart2>10120</SelStart2><SelEnd2>10120</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Board\inc\VCAN_OV7725_Eagle.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>19</YPos2><SelStart2>1069</SelStart2><SelEnd2>1069</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Board\src\VCAN_OV7725_Eagle.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>57</YPos2><SelStart2>1905</SelStart2><SelEnd2>1905</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\Board\src\VCAN_camera.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>528</SelStart2><SelEnd2>528</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\App\Image.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>776</YPos2><SelStart2>5725</SelStart2><SelEnd2>5725</SelEnd2></Tab><ActiveTab>7</ActiveTab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
     <Positions>
       
       
       
       
       
-    <Top><Row0><Sizes><Toolbar-048E7048><key>iaridepm.enu1</key></Toolbar-048E7048></Sizes></Row0><Row1><Sizes><Toolbar-2397B470><key>debuggergui.enu1</key></Toolbar-2397B470></Sizes></Row1><Row2><Sizes><Toolbar-2397BDD0><key>armjlink.enu1</key></Toolbar-2397BDD0></Sizes></Row2></Top><Left><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>450</Bottom><Right>168</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>146413</sizeHorzCX><sizeHorzCY>287770</sizeHorzCY><sizeVertCX>124451</sizeVertCX><sizeVertCY>650360</sizeVertCY></Rect></Wnd1></Sizes></Row0></Left><Right><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>450</Bottom><Right>315</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>146413</sizeHorzCX><sizeHorzCY>287770</sizeHorzCY><sizeVertCX>232064</sizeVertCX><sizeVertCY>650360</sizeVertCY></Rect></Wnd3></Sizes></Row0><Row1><Sizes><Wnd4><Rect><Top>-2</Top><Left>313</Left><Bottom>450</Bottom><Right>513</Right><x>313</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>146413</sizeHorzCX><sizeHorzCY>287770</sizeHorzCY><sizeVertCX>146413</sizeVertCX><sizeVertCY>650360</sizeVertCY></Rect></Wnd4></Sizes></Row1></Right><Bottom><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>152</Bottom><Right>1368</Right><x>-2</x><y>-2</y><xscreen>1370</xscreen><yscreen>154</yscreen><sizeHorzCX>1002928</sizeHorzCX><sizeHorzCY>221583</sizeHorzCY><sizeVertCX>146413</sizeVertCX><sizeVertCY>287770</sizeVertCY></Rect></Wnd0></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+    <Top><Row0><Sizes><Toolbar-060A7040><key>iaridepm.enu1</key></Toolbar-060A7040></Sizes></Row0><Row1><Sizes><Toolbar-1671AFA0><key>debuggergui.enu1</key></Toolbar-1671AFA0></Sizes></Row1><Row2><Sizes><Toolbar-1671B130><key>armjlink.enu1</key></Toolbar-1671B130></Sizes></Row2></Top><Left><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>450</Bottom><Right>168</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>146413</sizeHorzCX><sizeHorzCY>287770</sizeHorzCY><sizeVertCX>124451</sizeVertCX><sizeVertCY>650360</sizeVertCY></Rect></Wnd2></Sizes></Row0><Row1><Sizes><Wnd7><Rect><Top>-2</Top><Left>166</Left><Bottom>450</Bottom><Right>366</Right><x>166</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>146413</sizeHorzCX><sizeHorzCY>287770</sizeHorzCY><sizeVertCX>146413</sizeVertCX><sizeVertCY>650360</sizeVertCY></Rect></Wnd7></Sizes></Row1></Left><Right><Row0><Sizes><Wnd5><Rect><Top>-2</Top><Left>-2</Left><Bottom>450</Bottom><Right>315</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>146413</sizeHorzCX><sizeHorzCY>287770</sizeHorzCY><sizeVertCX>232064</sizeVertCX><sizeVertCY>650360</sizeVertCY></Rect></Wnd5></Sizes></Row0></Right><Bottom><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>152</Bottom><Right>1368</Right><x>-2</x><y>-2</y><xscreen>1370</xscreen><yscreen>154</yscreen><sizeHorzCX>1002928</sizeHorzCX><sizeHorzCY>221583</sizeHorzCY><sizeVertCX>146413</sizeVertCX><sizeVertCY>287770</sizeVertCY></Rect></Wnd0></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
   </Desktop>
 </Project>
 

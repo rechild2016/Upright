@@ -34,7 +34,7 @@ void CarInit()
     Car_Info.Acc_Offset=Acc_Offset;
     Car_Info.Gyro_Offset=Gyro_Offset;
     PID_Init(&SpeedPID,SpeedKp,SpeedKi,0,0);//速度环初始化
-    PID_Init(&DirPID,DirKp,0,DirKd,0);
+    PID_Init(&DirPID,DirKp,0,DirKd,80);
 
 }
 //直立控制

@@ -5,7 +5,7 @@
 #include "MK60_gpio.h"
 
 #define LDeath 110               //易变
-#define RDeath 90
+#define RDeath 80
 
 void motor_init()
 {    
@@ -24,30 +24,29 @@ void motor_control(int Lspeed,int Rspeed)
   
   if(Rspeed>850)Rspeed=850;
   else if(Rspeed<-850)Rspeed=-850;
-//右电机
-    if(Rspeed>=0)
+//左电机
+    if(Lspeed>=0)
       {
       ftm_pwm_duty(FTM3, FTM_CH4,0);
-      ftm_pwm_duty(FTM3, FTM_CH5,Rspeed + RDeath);
+      ftm_pwm_duty(FTM3, FTM_CH5,Lspeed + LDeath);
     }
     else
     {
       ftm_pwm_duty(FTM3, FTM_CH5,0);
-      ftm_pwm_duty(FTM3, FTM_CH4,-Rspeed + RDeath);// FTM模块号  通道号  占空比
+      ftm_pwm_duty(FTM3, FTM_CH4,-Lspeed + LDeath);// FTM模块号  通道号  占空比
     }
 
-  //左电机
-    if(Lspeed>=0)
+  //右电机
+    if(Rspeed>=0)
    {  
-      ftm_pwm_duty(FTM3, FTM_CH0,Lspeed + LDeath);
-      ftm_pwm_duty(FTM3, FTM_CH3,0);       
-    }
-    else
-    {
-      ftm_pwm_duty(FTM3, FTM_CH3,-Lspeed + LDeath);// FTM模块号  通道号  占空比
-      ftm_pwm_duty(FTM3, FTM_CH0,0);
-        
-    }
+     ftm_pwm_duty(FTM3, FTM_CH3,Rspeed + RDeath);// FTM模块号  通道号  占空比
+     ftm_pwm_duty(FTM3, FTM_CH0,0);        
+   }
+   else
+   {
+      ftm_pwm_duty(FTM3, FTM_CH0,-Rspeed + RDeath);
+      ftm_pwm_duty(FTM3, FTM_CH3,0);      
+   }
  
   
 }
