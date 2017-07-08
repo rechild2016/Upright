@@ -7,13 +7,13 @@
  uint16 gyro_init[5];
  uint16 AngleAcceleArry[6];
 
- uint8 limit=55;
+ uint8 limit=60;
  int lspeed=0,rspeed=0;
 
  uint8 imgbuff[CAMERA_SIZE]={1};   
  uint8 img[60][20]={0};
 
-extern unsigned char ConGraph[Img_H][Img_W];
+  extern unsigned char ConGraph[Img_H][Img_W];
  int Lspeed,Rspeed;
  int Rpulse=0,Lpulse=0; //左右编码器
  int16 LPulseSum=0,RPulseSum=0;//编码器累积值
@@ -22,18 +22,18 @@ extern unsigned char ConGraph[Img_H][Img_W];
  extern uint8 t;        //直立模糊表下标
  float Upright_Kp[5]={14, 16.0, 16.5,13.5, 5};//直立模糊PID 16.5  15  20  10 5
  float Upright_Kd[5]={ 8,  8.0,    5,   4, 0};      //   11.3 8  5  4  0
- float SpeedKp=4.0;     //速度PID   4
+ float SpeedKp=6.9;     //速度PID   4
  float SpeedKi=0.06;     //  0.4
- float DirKp=3.0;        //方向PID
- float DirKd=0;
+ float DirKp=2.0;        //方向PID
+ float DirKd=26;
  
  int CarRate=0;  
- int HighSpeed=30;
+ int HighSpeed=48;
  int LowSpeed=0;
  int CarGo=0;
-extern int midpoint_before;
-
  
+ extern int midpoint_before;
+
  float var[6];
  uint8 KeyFree=0;       //检测按键松开
  uint8 modle_key=0;
