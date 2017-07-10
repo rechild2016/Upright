@@ -76,21 +76,21 @@ int AAGAFilter(int *src)
 { 
  
    int i=0,Value=0;
-   int sum=0,CoeSum=1830;
-   int Coefficient[60]; 
+   int sum=0,CoeSum=820;
+   int Coefficient[40]; 
 
-   for(i=1;i<61;i++) //  求和
+   for(i=0;i<40;i++) //  求和
    {
-      Coefficient[i]=i;
+      Coefficient[i]=i+1;
    }
    
-   for(i=0;i<60;i++)
+   for(i=0;i<40;i++)
   {
     if(*(src+i)==0){
-     CoeSum+=-60+i;
+     CoeSum+=-40+i;
     }
     else
-    sum+=*(src+i) * Coefficient[59-i];
+    sum+=*(src+i) * Coefficient[39-i];
    }
     Value=sum/CoeSum;
     return(Value);  
@@ -147,7 +147,7 @@ int SearchBaseLines(uint8 *pSrc)//P2
         leadLine[i] = 0;
     }
 
-    //先搜索最下方若干(40)行，指现实中的行数
+    //先搜索最下方若干(30)行，指现实中的行数
     for (i = 0; i < MAX_SEARCH_HEIGHT; i++)
     {
         //向左搜索
@@ -627,7 +627,7 @@ void CrossRecognize(uint8 *src,uint8 *pSrc)//P1 P2
         {
             //完成左线 Y2为转折点
             float *ab = GetLSMatchingLine(leftLine, leftYStart, y2);
-            ab[1] += WIDTH / 2;//平移
+            ab[1] += WIDTH / 2  ;//平移
             int *lys = ReverseSearchLine(pSrc, leftLine, leftYStart, ab[0], ab[1], 1);
             if (lys[0] != -1 && lys[1] != -1)
             {
@@ -984,7 +984,7 @@ int *ReverseSearchLine(uint8 *pSrc, int line[], int start, float a, float b, int
 }
 
 //直入十字确定下直角
-int MAX_HORLINE_LENGTH = 15;
+int MAX_HORLINE_LENGTH = 50;
 int GetStraightDownRAngle(uint8 *src, int line[], int start, int end, int direction)
 {
     int pn=0,st=0;
@@ -1007,7 +1007,7 @@ int GetStraightDownRAngle(uint8 *src, int line[], int start, int end, int direct
                     break;
                 }
             }
-            if (pn > MAX_HORLINE_LENGTH)
+            if (pn > MAX_HORLINE_LENGTH+5)
             {
                 //直入十字
                 return i - 1;
@@ -1033,7 +1033,7 @@ int GetStraightDownRAngle(uint8 *src, int line[], int start, int end, int direct
                     break;
                 }
             }
-            if (pn > MAX_HORLINE_LENGTH)
+            if (pn > MAX_HORLINE_LENGTH+5)
             {
                 //直入十字
                 return i - 1;
@@ -1176,11 +1176,11 @@ void imageProcess(uint8 *src)//src校正后的图像
         uint8 i;
         
         //寻双线
-        RecordBWChange(src,p2);//记录跳变沿
+        RecordBWChange(src,p2); //记录跳变沿
 
-        re=SearchBaseLines(p2);//寻双线
-        CrossRecognize(p1,p2);
-        CalculateLeadLine();//计算引导线 
+        re=SearchBaseLines(p2); //寻双线
+        CrossRecognize(p1,p2);  //过十字线
+        CalculateLeadLine();    //计算引导线 
         leadlength=leadYEnd-leadYStart;
         
         Cuvre[0]=CuvreControl(leadYStart+leadlength*2/3,leadYEnd);
@@ -1189,7 +1189,7 @@ void imageProcess(uint8 *src)//src校正后的图像
        // Cuvre[3]=(Cuvre[0]*7+Cuvre[1]*2+Cuvre[2])/(3.0*10.0); 
         midpoint_before=AAGAFilter(leadLine);//加权平均滤波
         
-        if(abs(midpoint_before-midpoint_before_E)>30)
+        if(abs(midpoint_before-midpoint_before_E)>20)
           midpoint_before=midpoint_before_E;
         else
           midpoint_before_E=midpoint_before;
@@ -1361,4 +1361,9 @@ int CarpetSearch(int row)
       }
     }
     return mid;
+}
+
+int Scan(uint8 *src)
+{
+  
 }

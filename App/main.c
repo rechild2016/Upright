@@ -22,14 +22,16 @@
  extern uint8 t;        //直立模糊表下标
  float Upright_Kp[5]={14, 16.0, 16.5,13.5, 5};//直立模糊PID 16.5  15  20  10 5
  float Upright_Kd[5]={ 8,  8.0,    5,   4, 0};      //   11.3 8  5  4  0
- float SpeedKp=6.9;     //速度PID   4
- float SpeedKi=0.06;     //  0.4
- float DirKp=2.0;        //方向PID
- float DirKd=26;
- 
- int CarRate=0;  
- int HighSpeed=48;
- int LowSpeed=0;
+ float SpeedKp=7.0;     //速度PID   4
+ float SpeedKi=0.12;     //  0.4
+ float DirKp=2.5;        //方向PID
+ float DirKp2=3.0;        //方向PID
+ float DirKd=50;
+ float DirSetPoint=80;        //小了往右偏  大了往左偏
+   
+ float CarRate=0;  
+ int HighSpeed=55;
+ int LowSpeed=40;
  int CarGo=0;
  
  extern int midpoint_before;
@@ -81,7 +83,6 @@ void AllInit()
     Parameters_Init();  
     LCD_init();
     camera_init(imgbuff); 
-   //camera_init(ImageBuffer1[0]);
     SCCB_WriteByte(OV7725_CNST,limit);          //设置阈值
     ftm_quad_init(FTM1);     
     ftm_quad_init(FTM2); 
@@ -102,8 +103,7 @@ Site_t site     = {0, 0};                           //显示图像左上角位置
 void main()
 {
     
-    Site_t midline[60];
-    uint32  i=0,j=0,x=0,y=0,z=0;
+    uint32  i=0,j=0,x=0,y=0;
     int x0;
     AllInit();                
     
@@ -119,7 +119,7 @@ void main()
         var[5] =  Angle_dot;            //最终角速度
         //vcan_sendware((uint8_t *)var, sizeof(var));//上位机发送函数
         */
-
+       // motor_control(lspeed,rspeed);
         gpio_set(PTC15,1);
         camera_get_img();       //摄像头获取图像到imgbuff[CAMERA_SIZE]   //用时10ms
          for(i=0;i<Img_H;i++)
@@ -131,7 +131,10 @@ void main()
         {
           x0=CarpetSearch(59-i);
           if(x0>10 && x0<150)
+          {
             DFS(59-i,(x0+7)/8);
+            break;
+          }
        }
        
        for(i=0;i<60;i++)//非连通区域填黑
@@ -160,7 +163,7 @@ void main()
        
         imageProcess(p1);//图像处理
         gpio_set(PTC15,0); 
-
+        
         //显示信息参数
        if(key_check(KEY_B) == KEY_DOWN)
        {       
@@ -170,19 +173,19 @@ void main()
        }
        if(LCDShowMode)
        {
-         if(key_check(KEY_U) == KEY_DOWN)
+         /*if(key_check(KEY_U) == KEY_DOWN)
          {
-           limit++;
-           SCCB_WriteByte(OV7725_CNST,limit); 
+           DirSetPoint++;
+           SCCB_WriteByte(OV7725_CNST,DirSetPoint); 
          }
          else if(key_check(KEY_D) == KEY_DOWN)
          {
-           limit--;
-           SCCB_WriteByte(OV7725_CNST,limit);          //设置阈值
-         }
+           DirSetPoint--;
+           SCCB_WriteByte(OV7725_CNST,DirSetPoint);          //设置阈值
+         }*/
          LCD_Img_gray_Z(site_1, size_2, (uint8*)p1, imgsize);//显示解压后的初始图像
          LCD_line_display(site_1);
-         LCD_num_C(site2,limit,FCOLOUR,BCOLOUR);
+         LCD_num_C(site2,leadYEnd-leadYStart,FCOLOUR,BCOLOUR);
          CarGo=1;
        }
        else{
@@ -190,11 +193,10 @@ void main()
          vcan_sendimg(imgbuff,CAMERA_SIZE);
        }
         if(CarGo!=0)
-        {
-          if(CarRate<HighSpeed)
-            CarRate++;
-            
-     
+        {  
+            if(CarRate<HighSpeed)
+              CarRate+=0.5;
+          
         }
     }
 
@@ -248,8 +250,12 @@ void PIT0_IRQHandler(void)//1ms进一次中断
   
   else if(PIT0InteruptEventCount==1)//方向环
   {
-   
-     Car_Info.DirPWM=(int )LocPID_Calc(midpoint_before,&DirPID); 
+    if(leadYEnd-leadYStart < 25)DirPID.Kp=DirKp2;
+    else DirPID.Kp=DirKp;
+    if(midpoint_before<60)midpoint_before=60;
+    else if(midpoint_before>100)midpoint_before=100;
+     
+    Car_Info.DirPWM=(int )LocPID_Calc(midpoint_before,&DirPID); 
 
   }
   else if(PIT0InteruptEventCount==0)
@@ -330,9 +336,9 @@ void ParameterSet()
         LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , GREEN);
         LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_z_1, (int)Acc_Offset , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_x_2, (int)(SpeedPID.Kp*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_2, (int)(SpeedPID.Ki*100) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_2, (int)(SpeedPID.SetPoint) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
         break;
       }
     case 1://直立kd
@@ -344,9 +350,9 @@ void ParameterSet()
         LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , GREEN);
         LCD_num_C (site_z_1, (int)  Acc_Offset , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_x_2, (int)(SpeedPID.Kp*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_2, (int)(SpeedPID.Ki*100) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_2, (int)(SpeedPID.SetPoint) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
         break;
       }
     case 2://加速度offset
@@ -358,51 +364,51 @@ void ParameterSet()
         LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_z_1, (int)Acc_Offset , FCOLOUR , GREEN);
-        LCD_num_C (site_x_2, (int)(SpeedPID.Kp*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_2, (int)(SpeedPID.Ki*100) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_2, (int)(SpeedPID.SetPoint) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
         break;
       }
-    case 3://速度kp
+    case 3://方向kp
       {
         if(key_check(KEY_U) == KEY_DOWN)
-          SpeedPID.Kp+=0.1;
+          DirPID.Kp+=0.1;
         else if(key_check(KEY_D) == KEY_DOWN)
-           SpeedPID.Kp-=0.1;        
+          DirPID.Kp-=0.1;        
         LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_z_1, (int)Acc_Offset , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_x_2, (int)(SpeedPID.Kp*10) , FCOLOUR , GREEN);
-        LCD_num_C (site_y_2, (int)(SpeedPID.Ki*100) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_2, (int)(SpeedPID.SetPoint) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR ,GREEN);
+        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
         break;
       }
-    case 4://直立ki
+    case 4://方向kd
       {
         if(key_check(KEY_U) == KEY_DOWN)
-          SpeedPID.Ki+=0.01;
+          DirPID.Kd++;
         else if(key_check(KEY_D) == KEY_DOWN)
-           SpeedPID.Ki-=0.01;
+           DirPID.Kd--;
         LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_z_1, (int)Acc_Offset , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_x_2, (int)(SpeedPID.Kp*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_2, (int)(SpeedPID.Ki*100) , FCOLOUR , GREEN);
-        LCD_num_C (site_z_2, (int)(SpeedPID.SetPoint) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , GREEN);
+        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
         break;
       }
-    case 5://直立kd
+    case 5://方向setpoint
       {
         if(key_check(KEY_U) == KEY_DOWN)
-          CarRate += 5;
+          DirPID.SetPoint ++;
         else if(key_check(KEY_D) == KEY_DOWN)
-          CarRate -= 5;
+          DirPID.SetPoint --;
         LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_z_1, (int)Acc_Offset , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_x_2, (int)(SpeedPID.Kp*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_2, (int)(SpeedPID.Ki*100) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_2, (int)(SpeedPID.SetPoint) , FCOLOUR , GREEN);
+        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , GREEN);
         break;
       }
     }

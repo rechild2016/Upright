@@ -29,8 +29,7 @@ extern uint8  zhuantou;
 #define MIN_CROSS_LENGTH 10//十字交叉最小长度
 #define MAX_SEARCH_HEIGHT 40//最高赛道线底部Y方向坐标
 #define CROSS_LENGTH 5
-#define MAX_SERVOR_VALUE 9375+2800
-#define MIN_SERVOR_VALUE 9375-2800
+
 //变量声明
 extern uint32 row;
 
@@ -81,6 +80,7 @@ extern const uint8 leftEdge[PROW];
 extern const uint8 rightEdge[PROW];
 extern const uint8 weightTable[PROW];
 extern int leadlength;
+extern int LineType;
 
 void StaticThreshold(uint8 tr,uint8 *src);//静态二值化
 //二值化部分

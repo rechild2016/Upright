@@ -23,6 +23,7 @@ extern float Gyro_Offset;	 //陀螺仪偏移量
 extern  int16 LPulseSum,RPulseSum;//编码器累积值
 extern float DirKp;        //方向PID
 extern float DirKd;
+extern float DirSetPoint;
 void CarInit()
 {
     key_init(KEY_U);   key_init(KEY_D); 
@@ -34,7 +35,7 @@ void CarInit()
     Car_Info.Acc_Offset=Acc_Offset;
     Car_Info.Gyro_Offset=Gyro_Offset;
     PID_Init(&SpeedPID,SpeedKp,SpeedKi,0,0);//速度环初始化
-    PID_Init(&DirPID,DirKp,0,DirKd,80);
+    PID_Init(&DirPID,DirKp,0,DirKd,DirSetPoint);
 
 }
 //直立控制
