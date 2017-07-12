@@ -25,7 +25,7 @@
  float Upright_Kd[5]={ 8,  8.0,    5,   4, 0};      //   11.3 8  5  4  0
  float SpeedKp=7.0;     //速度PID   4
  float SpeedKi=0.12;     //  0.4
- float DirKp=2.5;        //方向PID
+ float DirKp=2.8;        //方向PID
  float DirKp2=3.0;        //方向PID
  float DirKd=40;
  float DirSetPoint=80;        //小了往右偏  大了往左偏

@@ -1889,30 +1889,6 @@ void imageProcess(uint8 *src)//src校正后的图像
           midpoint_before_E=midpoint_before;
         }
        
-                // 环形弯的寻找
-        /*{ int  sign_huan=0;
-          xyz=Crossorring(p1,p2);
-          if(xyz==0)
-          {   
-           FM (1) ;
-           DELAY_MS ( 100 ) ;
-           FM (0) ;
-            sign_huan=1;
-            } 
-        if(sign_huan==1&&((leftYEnd-leftYStart)+(rightYEnd-rightYStart)+(leadYEnd-leadYStart))<10&&leadYEnd<16)
-        { 
-          sign_huan=0;
-        }
-        }
-        */
-        
-       
-        
-       // Crossorring_huanxing();
-        
-      //  HuangXing();
-        //if(abs(leftYEnd-rightYEnd)>(abs(leftYStart-rightYStart))
-       // leftYStart = -1; rightYStart = -1; leftYEnd = -1; rightYEnd = -1; leadYStart = -1; leadYEnd = -1;
         
         Site_t site;
         site.x = 110;
@@ -2123,30 +2099,7 @@ void LCD_line_display(Site_t site)
 	half=(leadYStart+leadYEnd)/2;
   	leadnum0=leadLine[5]%10+(leadLine[5]%100)/10*10+(leadLine[5]%1000)/100*100;
 	leadnumhalf=leadLine[half]%10+(leadLine[half]%100)/10*10+(leadLine[half]%1000)/100*100;
-  /*  site.x = 10;
-    site.y = 16;
-    LCD_num_BC(site,leftYStart, 2,BLUE,RED);    
-	site.x = 10;
-    site.y = 32;
-    LCD_num_BC(site,leftYEnd, 2,BLUE,RED);
-    site.x = 50;
-    site.y = 16;
-    LCD_num_BC(site,rightYStart, 2,BLUE,RED);
-    site.x = 50;
-    site.y = 32;
-    LCD_num_BC(site,rightYEnd, 2,BLUE,RED);
-	site.x = 30;
-    site.y = 16;
-    LCD_num_BC(site,leadYStart, 2,BLUE,RED);
-    site.x = 30;
-    site.y = 32;
-    LCD_num_BC(site,leadYEnd, 2,BLUE,RED);
-	site.x = 80;
-    site.y = 16;
-    LCD_num_BC(site,leadnum0, 3,BLUE,RED);
-	site.x = 80;
-    site.y = 32;
-    LCD_num_BC(site,leadnumhalf, 3,BLUE,RED);*/
+
     for(site.y=60+leadYEnd;site.y>=60+leadYStart;(site.y)--)  
     {
         site.x=*(leadLine+PROW-site.y+60);
