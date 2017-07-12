@@ -4,45 +4,51 @@
 
 #include "arm_math.h"
 
-#define ColConnect(a,b) (a|b)!=255				//列连通 1连通
-#define RowConnect(a,b) (0x01&((a) | ((b) >>7)))==0	//行连通 0为连通
-
-
 uint8   stopflag=0;
 uint8   startgogo=0;
-//uint8   zhili=0;
+uint8   zhili=0;
 uint8   wending=0;
 uint8   biansu=0;
 uint8   biancan=0;
 uint8  zhuantou=0;
 
-//求连通图
-unsigned char ConGraph[Img_H][Img_W] = { 0 };//连通图
-uint8 IsConnect[Img_H]={0};
-extern uint8 img[60][20];
 //采集用的
-//uint8 Buffer[120];
+uint8 Buffer[120];
 //双数组采集用的
 uint8 processReady=0;
 uint8 wantProcess=0;
 //采集用的
 uint8 ImageBuffer1[SROW][SCOLUMN];
 uint8 ImageBuffer2[SROW][SCOLUMN];
-
+//连通图
+unsigned char ConGraph[60][20] = { 0 };//连通图
+uint8 IsConnect[60]={0};
+uint8 ConNum[60]={0};
+//求连通图
+extern uint8 img[60][20];
+#define ColConnect(a,b) (a|b)!=255				//列连通 1连通
+#define RowConnect(a,b) (0x01&((a) | ((b) >>7)))==0	//行连通 0为连通
 uint8 *pSample=ImageBuffer1[0];
 uint8 *pProcess=ImageBuffer2[0];
 uint8 *pTemp=ImageBuffer1[0];
+//环形
+int Linemid_1[PROW]={0};
+int xyz=-1;
+int huan_sign=0;
 //曲线
 int leftYStart, leftYEnd, rightYStart, rightYEnd, leadYStart, leadYEnd;//左线,右线和引导线的Y方向起始及终止点
 int LineType;  //曲线类型
 int leftLine[PROW];
 int rightLine[PROW];
+//障碍物最低行
+int block_hang=0;
 int leadLine[PROW];
 int ShowArray[PROW];//上位机显示数组
-int WIDTH=30;//记录赛道宽度
+int Ping[5];  //平均滤波 后期可删
+int WIDTH=36;//记录赛道宽度
 int leadlength;
-int midpoint_before = HEART,midpoint_before_E = HEART;
-
+int midpoint_before = HEART,midpoint_before_E = HEART  ;
+int Ruhuan_sign=0;
 int offset_1;//此处的offset_1  不可更改变量名为offset，野火库的关键字啊，不然怎么死的都不知道
 int offset_2;
 int dOffset;
@@ -52,6 +58,7 @@ float Cuvre[4];
 
 float CircleRate=0;
 
+uint8 STOP=0;
 
 uint8 processBuf1[PROW][PCOLUMN];//解压后处理前的
 uint8 processBuf2[PROW][PCOLUMN];//处理后的
@@ -72,39 +79,76 @@ void ArraySetValue(uint8 *src,uint8 value)
     }
 } 
 //加权递推平均滤波
-int AAGAFilter(int *src)
+int     AAGAFilter(int *src)
 { 
  
    int i=0,Value=0;
-   int sum=0,CoeSum=820;
-   int Coefficient[40]; 
+   int sum=0,CoeSum=465;
+   int Coefficient[30]; 
 
-   for(i=0;i<40;i++) //  求和
+   for(i=1;i<31;i++) //  求和
    {
-      Coefficient[i]=i+1;
+      Coefficient[i-1]=i;
    }
    
-   for(i=0;i<40;i++)
+   for(i=0;i<30;i++)
   {
-    if(*(src+i)==0){
-     CoeSum+=-40+i;
+    if(*(src+i)<1){
+     CoeSum+=-30+i;
     }
     else
-    sum+=*(src+i) * Coefficient[39-i];
+    sum+=*(src+i) * Coefficient[29-i];
    }
     Value=sum/CoeSum;
     return(Value);  
 }
+
+/**********************************
+//搜索边界
+int leftEdge1[PROW]={0};
+int rightEdge1[PROW]={0};
+
+void Search_the_boundary(void)
+{
+	int i,j;
+	for(i=59;i>=0;i--)//左边界
+	{
+		for(j=0;j<160;j++)
+		{
+			if(mapX[i][j]!=0)
+			{
+				leftEdge1[59-i]=j;
+				break;
+			}
+		}
+	}
+	for(i=59;i>=0;i--)//右边界
+	{
+		for(j=159;j>=0;j--)
+		{
+			if(mapX[i][j]!=0)
+			{
+				rightEdge1[59-i]=j;
+				break;
+			}
+		}
+	}
+        ;
+}*/
 
 /**************************************************************************************/
 /*****************************************寻找双线***********************************/
 //记录跳变沿
 void RecordBWChange(uint8 *src,uint8 *pSrc)//P1 P2
 {
-    int num1, num2;
+        int num1, num2;
+	int two_white_sign=0,two_black_sign=0,usefull_hang=0;
+        block_hang=0;
    ArraySetValue(pSrc, 255); //重组数组，P2全给0 
     for (int i = 0; i < PROW; i++)//每一行
-    {
+    {   two_white_sign=0;
+        two_black_sign=0;
+        
        for (int j = leftEdge[i]; j <  rightEdge[i]; j++)
         {
             num1 = *(src+i*PCOLUMN+j);
@@ -117,12 +161,69 @@ void RecordBWChange(uint8 *src,uint8 *pSrc)//P1 P2
             {
                 *(pSrc+i*PCOLUMN+j+1)= 1;
             }
-        }
-       
+	    else if(num1==255&& num2 == 255)
+		  	{
+                //if(!two_black_sign)
+			       two_white_sign++; 
+				if(two_black_sign>6&&two_black_sign<15)
+					{
+					//白 黑 白
+                                          
+					two_black_sign=0;//  置位使得每一行只进来一次
+                                        if(usefull_hang==0)
+                                          block_hang=i;
+                                        usefull_hang++;					                
+					
+				      }
+            }
+            else if(num1==0&& num2 == 0)
+            {
+             if(two_white_sign>1)
+			   two_black_sign++;
+		  	 } 
+
+	   }
  
     }
+   if(usefull_hang<10||usefull_hang>26)
+     block_hang=0; 
+             
+	
 }
-
+///**************中位数滤波*********/
+#define N 5
+int zwzfilter(int leadlength)
+{
+         int sum=0;
+         int buf[N],i,j,temp=0;
+          for(int m=0;m<leadlength/5;m++)
+          {
+       
+       for(i=0;i<N;i++)
+       {
+        buf[i]=leadLine[5*m+i];
+       }
+       for(i=0;i<N;i++)
+       {
+        Ping[i]=buf[i];
+       }
+       for(j=0;j<N-1;j++)
+         for(i=0;i<N-j-1;i++)
+         {
+            if(buf[i]>buf[i+1])
+            {
+              temp= buf[i];
+              buf[i]=buf[i+1];
+              buf[i+1]=temp;
+            }
+         }
+       
+  
+       sum+=buf[(N-1)/2];
+          }
+      return sum/(leadlength/5);
+       
+}
 
 
 /*****/
@@ -131,12 +232,11 @@ int leftHalf[PCOLUMN/2];
 int rightHalf[PCOLUMN/2];
 int leftHalf0[PCOLUMN/2];
 int rightHalf0[PCOLUMN/2];
-
 int SearchBaseLines(uint8 *pSrc)//P2
 {
     //变量定义
     int num, t1, leftCnt, rightCnt;
-    int i,j,m,n;
+    int i,j,m,n,lie;
     //清空之前的寻线数据
     leftYStart = -1; rightYStart = -1; leftYEnd = -1; rightYEnd = -1; leadYStart = -1; leadYEnd = -1;
     zhuantou=0;
@@ -146,8 +246,39 @@ int SearchBaseLines(uint8 *pSrc)//P2
         rightLine[i] = 0;
         leadLine[i] = 0;
     }
-
-    //先搜索最下方若干(30)行，指现实中的行数
+	/*************
+    int a=0;
+    WIDTH[0]=0;
+    for(i=0;i<PROW;i++)//搜索所有行，读取赛道宽度；
+    {
+        if(WIDTH[59]!=0)break;//已读取赛道宽度则退出       
+        leftCnt = 0;//找到的点数
+        for (j = HEART; j > 0; j--)
+        {
+            num = *(pSrc+(PROW - 1 - i)*PCOLUMN+j);
+            if (num == 1)
+            {
+                leftHalf0[leftCnt++] = j;//第几个点的列数
+            }
+        }
+        //向右搜索
+        rightCnt = 0;
+        for (j = HEART; j < 159; j++)
+        {
+            num = *(pSrc+(PROW - 1 - i)*PCOLUMN+j);
+            if (num == 1)
+            {
+                rightHalf0[rightCnt++] = j;
+            }
+        }
+        WIDTH[i]=rightHalf0[0]-leftHalf0[0];
+        a=a+WIDTH[i];
+        
+    }
+    a=a/60;
+    num=0;*/
+    //////////////************/
+    //先搜索最下方若干(40)行，指现实中的行数
     for (i = 0; i < MAX_SEARCH_HEIGHT; i++)
     {
         //向左搜索
@@ -189,13 +320,26 @@ int SearchBaseLines(uint8 *pSrc)//P2
         }
         else if (leftCnt != 0 && rightCnt != 0)//左右都有线
         {
-            for (m = 0; m < leftCnt; m++)
+
+		    /*leftYStart = i;
+		    leftYEnd = i;
+		    leftLine[i] = leftHalf[0];
+		    rightYStart = i;
+		    rightYEnd = i;
+		    rightLine[i] = rightHalf[0];*/
+		     for (m = 0; m < leftCnt; m++)
             {
                 for (n = 0; n < rightCnt; n++)
                 {
                     t1 = rightHalf[n] - leftHalf[m];//左右点间距
                     //1cm  为1.3个点
-                    //感觉此方法得进行校正后使用  
+                    //感觉此方法得进行校正后使用 
+                    /*if(t1<WIDTH - 8)
+                    {
+                    	lie++;
+						if(lie>=2)STOP=1;
+                    }*/
+                    
                     if (t1 < WIDTH + 8 && t1 > WIDTH - 8)//间距在赛道间距范围内  
                     {
                         leftYStart = i;
@@ -446,7 +590,10 @@ void CompleteLine(int line[])
             slope = ((float)t2 - t1) / ((float)y2 - y1);
             for (j = y1 + 1; j < y2; j++)
             {
+                
                 line[j] = (int)(t1 + slope * (j - y1) + 0.5);//0.5为四舍五入
+                if(processBuf1[line[j]][j]==0) /////////                    
+                  line[j] =0;                 /////////2017.7.9加，判断是不是黑线，黑线不布线
             }
             y1 = 0;
             y2 = 0;
@@ -461,17 +608,55 @@ void CompleteLine(int line[])
 //计算引导线
 void CalculateLeadLine()
 {
-    int y1, y2, y3, y4, yl, yr;
-    float divide;
-    //只有左线(完全没右线)
+    int y1, y2, y3, y4, yl, yr,leftLine_before=60,rightLine_before=100;
+    float divide; 
+    int sign=0;
+    //吧左右线为零的地方补线
+     for (int i = leftYStart; i <= leftYEnd; i++)
+        {
+              if(leftLine[i]==0)
+              leftLine[i]=leftLine_before;
+            
+              else
+              leftLine_before=leftLine[i];
+        }                     
+            for (int i = rightYStart; i <= rightYEnd; i++)
+        {
+        
+               if(rightLine[i]==0)
+              rightLine[i]=rightLine_before;
+           
+                else
+              rightLine_before=rightLine[i];  
+      
+    
+        }  
+        //只有左线(完全没右线)      
+            
     if (leftYStart != -1 && rightYStart == -1)
-    {
+    {   
         leadYStart = leftYStart;
         leadYEnd = leftYEnd;
+        
+
         for (int i = leadYStart; i <= leadYEnd; i++)
         {
-            leadLine[i] = leftLine[i] + WIDTH / 2;
+            
+          //检测左线右边是不是黑线，是黑线就1  白线 -1
+          for(int j=2;j<7;j++)
+          {
+           if(processBuf1[PROW-1-i][leftLine[i]-j]==0)
+                sign++;
+           else 
+                sign--;
+          
+          }
+          
+          leadLine[i] = leftLine[i] +sign/abs(sign)*WIDTH / 2;
+          sign=0;  
         }
+        
+        
     }
     //只有右线(完全没左线)
     else if (leftYStart == -1 && rightYStart != -1)
@@ -480,7 +665,21 @@ void CalculateLeadLine()
         leadYEnd = rightYEnd;
         for (int i = leadYStart; i <= leadYEnd; i++)
         {
-            leadLine[i] = rightLine[i] - WIDTH / 2;
+            
+          ////////////////////////////
+          for(int j=2;j<7;j++)
+          {
+           if(processBuf1[PROW-1-i][rightLine[i]+j]==255)
+                sign++;
+           else 
+                sign--;
+          
+          }
+          
+          leadLine[i] = rightLine[i] + sign/abs(sign)*WIDTH / 2;
+          sign=0;
+          
+          ///////////////////////
         }
     }
     //双线
@@ -498,7 +697,17 @@ void CalculateLeadLine()
 			
             for (int i = leadYStart; i <= leadYEnd; i++)
             {
-                leadLine[i] = leftLine[i] + WIDTH / 2;
+              for(int j=2;j<7;j++)
+           {
+           if(processBuf1[PROW-1-i][leftLine[i]-j]==0||processBuf1[PROW-1-i][leftLine[i]+j]==255)
+                sign++;
+           else 
+                sign--;
+          
+           }
+          
+          leadLine[i] = leftLine[i] +sign/abs(sign)*WIDTH / 2;
+          sign=0; 
             }
         }
         //右盛左衰
@@ -512,7 +721,17 @@ void CalculateLeadLine()
             leadYEnd = rightYEnd;
             for (int i = leadYStart; i <= leadYEnd; i++)
             {
-                leadLine[i] = rightLine[i] - WIDTH / 2;
+                for(int j=2;j<7;j++)
+          {
+           if(processBuf1[PROW-1-i][rightLine[i]+j]==255||processBuf1[PROW-1-i][rightLine[i]-j]==0)
+                sign++;
+           else 
+                sign--;
+          
+          }
+          
+          leadLine[i] = rightLine[i] + sign/abs(sign)*WIDTH / 2;
+          sign=0; 
             }
         }
         //阴阳协调
@@ -532,12 +751,39 @@ void CalculateLeadLine()
             for (int i = y1; i < y2; i++)//
             {
                 if (y1 == leftYStart)
-                {
-                    leadLine[i] = leftLine[i] + WIDTH / 2;
-                }
+              {
+                        ////////////////////////////
+               
+          for(int j=2;j<7;j++)
+           {
+           if(processBuf1[PROW-1-i][leftLine[i]-j]==0||processBuf1[PROW-1-i][leftLine[i]+j]==255)
+                sign++;
+           else 
+                sign--;
+            
+           
+           
+           }
+          
+          leadLine[i] = leftLine[i] +sign/abs(sign)*WIDTH / 2;
+          sign=0; 
+          /////////////////////// 
+              }
                 else
                 {
-                    leadLine[i] = rightLine[i] - WIDTH / 2;
+              ////////////////////
+                   for(int j=2;j<7;j++)
+                {
+            if(processBuf1[PROW-1-i][rightLine[i]+j]==255||processBuf1[PROW-1-i][rightLine[i]-j]==0)
+                sign++;
+            else 
+                sign--;
+          
+                 }
+          
+          leadLine[i] = rightLine[i] + sign/abs(sign)*WIDTH / 2;
+          sign=0; 
+          ////////////////////////
                 }
             }
             for (int i = y2; i <= y3; i++)//看不懂，效果上来说，没问题
@@ -554,12 +800,137 @@ void CalculateLeadLine()
                 }
                 if(yl<PROW && yr<PROW)
                 {
-                    leadLine[(yl + yr) / 2] = (leftLine[yl] + rightLine[yr]) / 2;
+                    ////////////////////////////
+               for(int j=2;j<7;j++)
+            {
+           
+             if(processBuf1[PROW-1-i][rightLine[i]+j]==255&&processBuf1[PROW-1-i][leftLine[i]-j]==255&&processBuf1[PROW-1-i][rightLine[i]-j]==0&&processBuf1[PROW-1-i][leftLine[i]+j]==0)            
+             sign++;
+            else 
+             sign--;          
+             } 
+              if(sign>0)
+              {
+                leadLine[(yl + yr) / 2] = leftLine[yl] - WIDTH / 2;
+              
+             
+              }
+               else
+                leadLine[(yl + yr) / 2] = (leftLine[yl] + rightLine[yr]) / 2;
+               
+               sign=0;
                 }
+           ////////////////////////////////////////////////     
             }
             CompleteLine(leadLine);
         }
     }
+}
+//深搜 从x,y位置开始递归往下搜 找到所有连通区域
+//搜索顺序是正上、左上、右上、左、右、左下、右下、正下 
+//左右连通判断 和 上下连通判断是不同的方法
+void DFS(int x,int y)//完成
+{
+    if (x<0 || x>=60 || y<0 || y>=20)return;//避免出界
+    if (ConGraph[x][y] != 0 ) return;//已经搜索过，跳出递归
+    ConGraph[x][y] = 1;//标记连通
+    IsConnect[x]=1;
+    if (x > 0)//往上方搜 
+    {
+        if (ColConnect(img[x][y], img[x - 1][y]))
+            DFS(x - 1, y);
+    }
+    if (y > 0 )//左右搜
+    {
+        if (RowConnect(img[x][y-1], img[x][y]))
+            DFS(x, y - 1);
+    }
+    if (y < 20-1)
+    {
+        if (RowConnect(img[x][y] , img[x][y + 1]))
+            DFS(x, y + 1);
+    }
+    if (x < 60-1)//往下搜
+    {
+        if (ColConnect(img[x][y], img[x + 1][y]))
+            DFS(x + 1, y);
+    }
+}
+
+//找右跳变点 从白变位黑 0000 1111 返回跳变点位置
+int RightJump(unsigned char a)
+{
+    int  i;
+    if (a >= 0x0f )//左边存在黑点 在左边找跳变
+    {
+        a >>= 4;
+        for (i = 0; i < 4; i++)
+        {
+            if ((a&(1 << i)) == 0)break;
+        }
+        i += 4;
+    }
+    else {//右边找跳变
+        for (i = 0; i < 4; i++)
+        {
+            if ((a&(1 << i)) == 0)break;
+        }
+    }
+    return 8 - i;
+}
+
+//找左跳变点  从黑变成白 1111 0000
+int LeftJump(unsigned char a)
+{
+    int i = 0;
+    if ((a & 0x0f) != 0x0f)//右边四个不都是1
+    {
+        for (i = 0; i < 4; i++)
+        {
+            if ((a >> i) & 0x01 == 1)break;
+        }
+        i = 8 - i;
+    }
+    else//在左边四个找到跳变点
+    {
+        a >>= 4;
+        for (i = 0; i < 4; i++)
+        {
+          if ((a >> i) & 0x01 == 1)break;
+        }
+        i = 4 - i;
+    }
+    return i;
+}
+//地毯式搜索 用于前三行 
+//找到这一行中最大的一段白线的中点
+int CarpetSearch(int row)
+{
+    int ans;
+    int len = 0, Maxlen = 0;
+    int start,end,mid=-1;
+    int i,j;
+    for (i = 0; i < 20; i++)
+    {
+      if (img[row][i] != 0xff)//出现白点
+      {
+        start = LeftJump(img[row][i])+i*8;//标记起点
+        for (j = i+1; j < 20; j++)
+        {
+          if (img[row][j] != 0x00)//出现黑点
+              break;
+        }
+        end = RightJump(img[row][j]) + j * 8;
+        ans = (int)((start + end + 0.5) / 2 );
+        i = j;
+        len = end - start;
+        if (len > Maxlen) {
+            mid = ans;
+            Maxlen = len;
+        }
+      }
+    }
+    return mid;
 }
 
 //去除噪点
@@ -627,7 +998,7 @@ void CrossRecognize(uint8 *src,uint8 *pSrc)//P1 P2
         {
             //完成左线 Y2为转折点
             float *ab = GetLSMatchingLine(leftLine, leftYStart, y2);
-            ab[1] += WIDTH / 2  ;//平移
+            ab[1] += WIDTH / 2;//平移
             int *lys = ReverseSearchLine(pSrc, leftLine, leftYStart, ab[0], ab[1], 1);
             if (lys[0] != -1 && lys[1] != -1)
             {
@@ -860,7 +1231,7 @@ float *GetLSMatchingLine(int line[], int start, int end)//leftLine, leftYStart, 
 }
 
 //判断线段类型
-float MAX_STRAIGHT_AREA = 7;
+float MAX_STRAIGHT_AREA = 1.01;
 int JudgeLineType(int line[], int start, int end)
 {
     float a, b, sum, dis, avDis;
@@ -984,7 +1355,7 @@ int *ReverseSearchLine(uint8 *pSrc, int line[], int start, float a, float b, int
 }
 
 //直入十字确定下直角
-int MAX_HORLINE_LENGTH = 50;
+int MAX_HORLINE_LENGTH = 15;
 int GetStraightDownRAngle(uint8 *src, int line[], int start, int end, int direction)
 {
     int pn=0,st=0;
@@ -1007,7 +1378,7 @@ int GetStraightDownRAngle(uint8 *src, int line[], int start, int end, int direct
                     break;
                 }
             }
-            if (pn > MAX_HORLINE_LENGTH+5)
+            if (pn > MAX_HORLINE_LENGTH)
             {
                 //直入十字
                 return i - 1;
@@ -1033,7 +1404,7 @@ int GetStraightDownRAngle(uint8 *src, int line[], int start, int end, int direct
                     break;
                 }
             }
-            if (pn > MAX_HORLINE_LENGTH+5)
+            if (pn > MAX_HORLINE_LENGTH)
             {
                 //直入十字
                 return i - 1;
@@ -1141,7 +1512,6 @@ void CrossMakeUpLine(int line[], int start, int end)
         }
     }
 }
-
 /*********************/
 //计算曲率1
   int A,C,BC,AB,T;
@@ -1163,6 +1533,290 @@ float CuvreControl(int start,int end)
   X=(float)2.0*BC/(float)(AB*AB+BC*BC);
   return X;
 }
+//环形弯的处理
+void HuangXing(void)
+{int i,j,num=0,sum=0;
+  for(i=59;i>20;i--)
+  {
+     for (j = rightEdge[i]; j >leftEdge[i] ; j--)
+     {
+     
+       if(processBuf1[59][j]==255||processBuf1[58][j]==255||processBuf1[57][j]==255||processBuf1[55][j]==255)
+       {   
+       if(i<30)
+       {
+       if(processBuf1[i][j]==255)
+        {sum++;
+         continue;
+         }
+       }
+       else
+       {
+        if(processBuf1[i][j]==0)
+        { sum++;
+         continue;
+         }
+       }
+       }
+        
+     } 
+     if (sum==0)
+       {num++;
+        sum=0;
+        } 
+ 
+  }
+      Site_t site;
+        site.x = 110;
+        site.y = 10;
+        LCD_num_BC(site,num, 3,BLUE,RED); 
+
+}
+
+/************************************************************/
+int GetStraightDownRAngle_2(uint8 *src, int line[], int start, int end, int direction)
+	//P2 leftLine, leftYStart, leftYEnd, 1
+{
+    int pn=0,st=0;
+    //左线
+    if (direction == 1)
+    {
+        if(end-start<=2){st=start+1;}
+        else{st=end-2;}
+        for (int i = st; i <= end; i++)
+        {
+            pn = 0;
+            for (int j = line[end]; j < HEART; j++)
+            {
+                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//无跳变
+                {
+					pn++;
+                }
+                else if(pn>2)
+                {
+			       	return i - 1;
+					
+                }
+                
+            }
+            if (pn > MAX_HORLINE_LENGTH)
+            {
+                
+                return  -1;
+            }
+        }
+    }
+    //右线
+    else if (direction == 2)
+    {
+        if(end-start<=2){st=start+1;}
+        else{st=end-2;}
+        for (int i = st; i <= end; i++)
+        {
+            pn = 0;
+            for (int j = line[end]; j > HEART; j--)
+            {
+                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//无跳变
+                {
+					pn++;
+                }
+                else if(pn>2)
+                {
+			       	return i - 1;
+					
+                }
+                
+            }
+            if (pn > MAX_HORLINE_LENGTH)
+            {
+                
+                return  -1;
+            }
+        }
+    }
+    return -1;
+}
+
+/************************************************************/
+int GetStraightDownRAngle_1(uint8 *src, int line[], int start, int end, int direction)
+	//P2 leftLine, leftYStart, leftYEnd, 1
+{
+    int pn=0,st=0;
+    //左线
+    if (direction == 1)
+    {
+        if(end-start<=2){st=start+1;}
+        else{st=end-2;}
+        for (int i = st; i <= end; i++)
+        {
+            pn = 0;
+            for (int j = line[end]; j < HEART; j++)
+            {
+                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//无跳变
+                {
+					pn++;
+                }
+                else if(pn<=2)
+                {
+			       	return i - 1;
+					
+                }
+                
+            }
+            if (pn > MAX_HORLINE_LENGTH)
+            {
+                
+                return  -1;
+            }
+        }
+    }
+    //右线
+    else if (direction == 2)
+    {
+        if(end-start<=2){st=start+1;}
+        else{st=end-2;}
+        for (int i = st; i <= end; i++)
+        {
+            pn = 0;
+            for (int j = line[end]; j > HEART; j--)
+            {
+                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//无跳变
+                {
+					pn++;
+                }
+                else if(pn<=2)
+                {
+			       	return i - 1;
+					
+                }
+                
+            }
+            if (pn > MAX_HORLINE_LENGTH)
+            {
+                
+                return  -1;
+            }
+        }
+    }
+    return -1;
+}
+
+//*************判断十字或环形**************/
+//    0为直线入环
+//    1为直线入十字
+//    2为斜入环
+//    3为斜入十字
+//    -1为均不是
+int Crossorring(uint8 *src,uint8 *pSrc)
+{
+	
+	int i,j,k,num,sum=0;
+	int midY=-1;
+	float a,b,c,d;
+	int  ly1 = -1, ry1 = -1;
+	int Linemid;
+	int  ly2 = -1, ry2 = -1;
+	int endmix,endmax,startmix,startmax;
+	//直入
+	if (leftYStart != -1&&rightYStart != -1)
+        {
+        //ly2 = GetStraightDownRAngle(src, leftLine, leftYStart, leftYEnd, 1);
+		//ry2 = GetStraightDownRAngle(src, rightLine, rightYStart, rightYEnd, 2);
+		if(leftYEnd>=rightYEnd)
+    	{
+    		  endmax=leftYEnd;
+		  endmix=rightYEnd;
+    	}
+		else
+		{
+		endmax=rightYEnd;
+		endmix=leftYEnd;
+		}
+		if(leftYStart>=rightYStart)
+    	{ 
+    		startmax=leftYStart;
+		startmix=rightYStart;
+    	}
+		else
+		{
+			startmax=rightYStart;
+			startmix=leftYStart;
+		}
+		
+		if(endmix-startmax<=3)return -1;
+                if(endmix>=30)return -1;
+		if((endmax-endmix)>18)return -1;
+		ly2 = GetStraightDownRAngle_2(src, leftLine, leftYStart, leftYEnd, 1);
+		ry2 = GetStraightDownRAngle_2(src, rightLine, rightYStart, rightYEnd, 2);
+                ly1 = GetStraightDownRAngle_1(src, leftLine, leftYStart, leftYEnd, 1);
+		ry1 = GetStraightDownRAngle_1(src, rightLine, rightYStart, rightYEnd, 2);
+		
+		if ((ly2 != -1 && ry2 != -1)||(ly1 != -1 && ry1 != -1))//存在下直角
+		{
+			for(i=startmax;i<=endmix-3;i++)
+			{
+				Linemid_1[i]=(int)(leftLine[i]+rightLine[i])/2;
+			}
+			//float *kv = GetLSMatchingLine(Linemid_1, startmax,endmix-4);
+                        //c=kv[0];d=kv[1];
+            if((endmix-3-startmax)<=2)return -1;
+            c=1.0*(Linemid_1[endmix-3]-Linemid_1[startmax])/((endmix-3)-startmax);
+			d=Linemid_1[endmix-3];
+			sum=0;
+			for(k=20;k<=25;k++)
+			{
+				Linemid=(int)(c*k+d);
+				for(i=Linemid-3;i<Linemid+3;i++)
+				{
+					num = *(src+(PROW - 1 - endmix-k)*PCOLUMN+i);
+					if(num == 0)//有跳变
+					{sum++;}
+					if(sum>=10)return 0;//直入圆环
+				}
+			}
+			if((endmax!=PROW - 1)&&(sum<3))
+			{
+				return 1;//直入直角
+			}
+		}	
+	}
+	/*else if(leftYStart != -1&&rightYStart == -1)//只有左线
+	{		
+		midY=GetBiasDownRAngleX(leftLine, leftYStart, leftYEnd);
+		if(midY!=-1)
+		{
+			
+			float *abf = GetLSMatchingLine(leftLine, leftYStart, midY);
+            a=abf[0];
+			float *abb = GetLSMatchingLine(leftLine, midY+1, leftYEnd);
+            b=abb[0];
+			Angle=a*b;
+			if(Angle<-3)return 2;//斜入环
+			else if(-3<Angle<0) return 3;//斜入十字
+			else return -1;
+                       
+		}
+		else return -1;
+	}*/
+	/*else if(leftYStart == -1&&rightYStart != -1)//只有右线
+	{
+		midY=GetBiasDownRAngle(rightLine, rightYStart, rightYEnd);
+		if(midY!=-1)
+		{
+			
+			float *abf = GetLSMatchingLine(rightLine, rightYStart, midY);
+            a=abf[0];
+			float *abb = GetLSMatchingLine(rightLine, midY+1, rightYEnd);
+            b=abb[0];
+			Angle=a*b;
+			if(Angle<-3)return 2;//斜入环
+			else if(-3<Angle<0) return 3;//斜入十字
+			else return -1;                       
+		}
+		else return -1;
+	}*/
+	else return -1;
+}
 
 
 
@@ -1175,24 +1829,90 @@ void imageProcess(uint8 *src)//src校正后的图像
         int8 re;
         uint8 i;
         
-        //寻双线
-        RecordBWChange(src,p2); //记录跳变沿
-
-        re=SearchBaseLines(p2); //寻双线
-        CrossRecognize(p1,p2);  //过十字线
-        CalculateLeadLine();    //计算引导线 
-        leadlength=leadYEnd-leadYStart;
+        int test[5];
         
+        
+
+        //寻双线
+        RecordBWChange (src,p2);//记录跳变沿
+
+        
+        re=SearchBaseLines(p2);//寻双线
+        
+        //if(re==-1) ArraySetValue(p2,255);
+         // re=RemoveNoise(1);//移除噪音
+        //if(re==-1) ArraySetValue(p2,255);
+        //十字交叉
+        //引导线
+        //re=RemoveNoise(2);//移除噪音
+        //if(re==-1) ArraySetValue(p2,255);
+        CrossRecognize(p1,p2);
+        
+       
+        //xyz=Crossorring(p1,p2);
+        CalculateLeadLine();//计算引导线 
+        ///////处理环形弯
+        huan_sign=judgebigring(20);
+        if(huan_sign<20&&huan_sign>15)
+        {   //led (LED0,LED_ON);
+           // FM (1) ;
+            DELAY_MS ( 10 ) ;
+          //  FM (0) ;
+            //led (LED0,LED_OFF);
+            for(int i=0;i<20;i++)
+              leadLine[i]=leftEdge[i]+WIDTH / 3;    
+        }
+        
+       ////////处理障碍
+        block_hang=block_avoid();
+        if(block_hang>10)
+        {
+           // FM (1) ;
+            DELAY_MS ( 40 ) ;
+           // FM (0) ;
+        
+    
+        }
+      
+        leadlength=leadYEnd-leadYStart;
         Cuvre[0]=CuvreControl(leadYStart+leadlength*2/3,leadYEnd);
         Cuvre[1]=CuvreControl(leadYStart+leadlength/3,leadYStart+leadlength*2/3-1);
-        Cuvre[2]=CuvreControl(leadYStart,leadYStart+leadlength/3-1);
-       // Cuvre[3]=(Cuvre[0]*7+Cuvre[1]*2+Cuvre[2])/(3.0*10.0); 
+        Cuvre[2]=CuvreControl(leadYStart,leadYEnd);
         midpoint_before=AAGAFilter(leadLine);//加权平均滤波
-        
-        if(abs(midpoint_before-midpoint_before_E)>20)
-          midpoint_before=midpoint_before_E;
+        // midpoint_before=zwzfilter(leadlength);
+       
+        if(abs(midpoint_before-midpoint_before_E)>30)
+        midpoint_before=midpoint_before_E;
         else
+        {
+          midpoint_before=midpoint_before*0.5+midpoint_before_E*0.5;
           midpoint_before_E=midpoint_before;
+        }
+       
+                // 环形弯的寻找
+        /*{ int  sign_huan=0;
+          xyz=Crossorring(p1,p2);
+          if(xyz==0)
+          {   
+           FM (1) ;
+           DELAY_MS ( 100 ) ;
+           FM (0) ;
+            sign_huan=1;
+            } 
+        if(sign_huan==1&&((leftYEnd-leftYStart)+(rightYEnd-rightYStart)+(leadYEnd-leadYStart))<10&&leadYEnd<16)
+        { 
+          sign_huan=0;
+        }
+        }
+        */
+        
+       
+        
+       // Crossorring_huanxing();
+        
+      //  HuangXing();
+        //if(abs(leftYEnd-rightYEnd)>(abs(leftYStart-rightYStart))
+       // leftYStart = -1; rightYStart = -1; leftYEnd = -1; rightYEnd = -1; leadYStart = -1; leadYEnd = -1;
         
         Site_t site;
         site.x = 110;
@@ -1200,8 +1920,200 @@ void imageProcess(uint8 *src)//src校正后的图像
         LCD_num_BC(site,midpoint_before, 3,BLUE,RED); 
         
         LineType=JudgeLineType(leadLine,leadYStart,leadYEnd);
- 
+          
         
+}
+
+int block_avoid(void)
+{int i,j;
+ int white_sign=0,two_black_sign=0,usefull_hang=0,wide_hang=0;
+    if(leadlength<45||(leftYEnd-leftYStart<40)||(rightYEnd-rightYStart)<40)
+		return 0;
+    
+   for(i=block_hang+2;i<block_hang+5;i++)
+     {    wide_hang=leftLine[i]-leftLine[i]-3;
+	 for(j=leftLine[block_hang]+1;j<rightLine[block_hang];j++)
+	 	{
+                     if(processBuf1[i][j]==255)
+		  	{
+                         white_sign++;                          
+                        }
+                }
+          if(white_sign>=wide_hang)
+          {
+           usefull_hang++;
+           if(usefull_hang>1)
+	   	return block_hang;
+           white_sign=0;
+          }
+	   	 
+    }
+   return 0;
+
+}
+
+
+
+
+void Crossorring_huanxing(void)
+{ 
+  int i,j;
+ /*// int leadLine_T[PROW];
+  for(i=0;i<40;i++)
+  {
+    for(j=leftEdge[i]-2;j<80;j++)
+       {
+            if(processBuf1[i][j]==0&&processBuf1[i][j+1]==255)
+            {leadLine[i] =j+ WIDTH / 2;
+            break;
+              }
+      
+        } 
+  */
+   // leftYStart = -1; rightYStart = -1; leftYEnd = -1; rightYEnd = -1; leadYStart = -1; leadYEnd = -1;
+    if(((rightYEnd-leftYStart)+(leadYEnd-rightYStart)+(leftYEnd-leadYStart))<6&&leadYEnd<16&&rightYEnd<16&&leftYEnd<16&&leadYEnd>5&&rightYEnd>5&&leftYEnd>5)     
+    { 
+      if((leftYStart!=-1)&&(rightYStart!=-1)&&(leftYEnd !=-1)&&(rightYEnd!= -1)&&(leadYStart!= -1)&&(leadYEnd!= -1))
+      {midpoint_before=60;
+       DELAY_MS ( 60 ) ;
+           FM (1) ;
+           DELAY_MS ( 100 ) ;
+           FM (0) ;
+      }
+    } 
+    
+    
+    /*
+      for(i=0;i<PROW;i++)
+    {if(processBuf1[i][80]&&processBuf1[i][79])
+      
+      
+    }
+  */
+       
+ 
+
+}
+///////////判断大圆环，有全黑的行数
+////////
+////  black_hang_up  :从下面找到的第一行全黑上面第black_hang向下找五行，有四行全黑则判断为环形
+int judgebigring(int black_hang_up)
+{
+	int plot_black_L=0,plot_white_L=0,all_black=0,all_white=0,parts_black=0,wide_hang=0,black_hang=0,i;
+        int plot_black_R=0,plot_white_R=0,all_black_hang=0;   
+        int plot_sign;
+        //加判断条件，节约时间  最顶行为全黑，最低行为全白
+        for(uint8 y=leftEdge[1]+1;y<rightEdge[1]-1; y++)
+        {
+          
+        if (processBuf1[1][y]==255)//0是黑，255白 
+          {
+            plot_sign++;
+            if(plot_sign>4)
+             return 0;                       
+          } 
+        }
+        for(uint8 y=leftEdge[58]+1;y<rightEdge[58]-1; y++)
+        {
+          
+        if (processBuf1[58][y]==0)//0是黑，255白 
+          {
+               plot_sign++;
+            if(plot_sign>4)
+             return 0;                      
+          } 
+        }
+       //////////////////////////////////////////
+        
+	for (i = 0; i < PROW-10; i++)//每一行
+    {
+         wide_hang=rightEdge[PROW-1-i]-leftEdge[PROW-1-i]-3;
+        for (uint8 l = HEART,r=HEART;l>leftEdge[PROW-1-i]+1,r<rightEdge[PROW-1-i]-1; l--,r++)
+        {      
+          if (processBuf1[PROW-1-i][HEART]==0)//0是黑，255白 
+          {
+            if (processBuf1[PROW-1-i][l]==0)
+           {
+                 plot_black_L++;
+                                 
+           }
+           if(processBuf1[PROW-1-i][r]==0)
+           {
+              plot_black_R++;
+           }
+           if (processBuf1[PROW-1-i][l]==255)
+           {
+                 plot_white_L++;
+             
+           }
+           if(processBuf1[PROW-1-i][r]==255)
+           {     plot_white_R++;
+           
+           }
+          }
+           else
+             break;
+          if(((plot_black_L+plot_black_R)>=wide_hang/4)&&(plot_white_L>=2)&&(plot_white_R>=2))   ////中间出现黑色，两边是白色
+           {
+           parts_black++;
+            }
+           if((plot_black_L+plot_black_R)>=wide_hang)
+           {
+            all_black++;
+           if(parts_black>=3)
+           {black_hang=i;    //出现全黑的行数
+            break;
+            }
+           
+           }
+        }
+         plot_white_L=0;
+         plot_black_R=0;
+         plot_black_L=0;
+         plot_white_R=0;
+           if(black_hang==i&&i!=0)
+             break;                   
+        }
+        ///////////////////////////////上面是找中间黑，两边白 ，下面是满足上面条件后，检验上面 black_hang行是不是存在几行全黑
+        if(black_hang==i&&i!=0)
+     {
+         int black_all=0,plot_black=0,all_black_hang=0; 
+        for(int j=black_hang+black_hang_up;j>black_hang+black_hang_up-5;j--)
+        {  
+          wide_hang=rightEdge[PROW-1-j]-leftEdge[PROW-1-j]-3;
+          for (uint8 l = HEART,r=HEART;l>leftEdge[PROW-1-j]+1,r<rightEdge[PROW-1-j]-1; l--,r++)
+        {      
+          if (processBuf1[PROW-1-j][HEART]==0)
+          {
+           if (processBuf1[PROW-1-j][l]==0)               
+           {
+                 black_all++;                                 
+           }
+           if(processBuf1[PROW-1-j][r]==0)//0是黑，255白 )
+           {
+             black_all++;
+           }
+           
+           
+          }
+           else
+             break;
+          if(black_all>=wide_hang)
+           {
+            all_black_hang++;
+            
+           }
+        }        
+        black_all=0;
+        
+        }
+        if(all_black_hang>=3)
+               return  black_hang;
+           else
+               return  0;
+        
+     }
+     return  0;
 }
 
 uint32 leadnum0,leadnumhalf;
@@ -1211,9 +2123,9 @@ void LCD_line_display(Site_t site)
 	half=(leadYStart+leadYEnd)/2;
   	leadnum0=leadLine[5]%10+(leadLine[5]%100)/10*10+(leadLine[5]%1000)/100*100;
 	leadnumhalf=leadLine[half]%10+(leadLine[half]%100)/10*10+(leadLine[half]%1000)/100*100;
-    site.x = 10;
+  /*  site.x = 10;
     site.y = 16;
-   /* LCD_num_BC(site,leftYStart, 2,BLUE,RED);    
+    LCD_num_BC(site,leftYStart, 2,BLUE,RED);    
 	site.x = 10;
     site.y = 32;
     LCD_num_BC(site,leftYEnd, 2,BLUE,RED);
@@ -1253,117 +2165,4 @@ void LCD_line_display(Site_t site)
         site.x=site.x*0.8;
         LCD_point(site, BLUE);
     }
-    
-}   
-//深搜 从x,y位置开始递归往下搜 找到所有连通区域
-//搜索顺序是正上、左上、右上、左、右、左下、右下、正下 
-//左右连通判断 和 上下连通判断是不同的方法
-void DFS(int x,int y)//完成
-{
-    if (x<0 || x>=Img_H || y<0 || y>=Img_W)return;//避免出界
-    if (ConGraph[x][y] != 0 ) return;//已经搜索过，跳出递归
-    ConGraph[x][y] = 1;//标记连通
-    IsConnect[x]=1;
-    if (x > 0)//往上方搜 
-    {
-        if (ColConnect(img[x][y], img[x - 1][y]))
-            DFS(x - 1, y);
-    }
-    if (y > 0 )//左右搜
-    {
-        if (RowConnect(img[x][y-1], img[x][y]))
-            DFS(x, y - 1);
-    }
-    if (y < Img_W-1)
-    {
-        if (RowConnect(img[x][y] , img[x][y + 1]))
-            DFS(x, y + 1);
-    }
-    if (x < Img_H-1)//往下搜
-    {
-        if (ColConnect(img[x][y], img[x + 1][y]))
-            DFS(x + 1, y);
-    }
-}
-
-//找右跳变点 从白变位黑 0000 1111 返回跳变点位置
-int RightJump(unsigned char a)
-{
-    int  i;
-    if (a >= 0x0f )//左边存在黑点 在左边找跳变
-    {
-        a >>= 4;
-        for (i = 0; i < 4; i++)
-        {
-            if ((a&(1 << i)) == 0)break;
-        }
-        i += 4;
-    }
-    else {//右边找跳变
-        for (i = 0; i < 4; i++)
-        {
-            if ((a&(1 << i)) == 0)break;
-        }
-    }
-    return 8 - i;
-}
-
-//找左跳变点  从黑变成白 1111 0000
-int LeftJump(unsigned char a)
-{
-    int i = 0;
-    if ((a & 0x0f) != 0x0f)//右边四个不都是1
-    {
-        for (i = 0; i < 4; i++)
-        {
-            if ((a >> i) & 0x01 == 1)break;
-        }
-        i = 8 - i;
-    }
-    else//在左边四个找到跳变点
-    {
-        a >>= 4;
-        for (i = 0; i < 4; i++)
-        {
-          if ((a >> i) & 0x01 == 1)break;
-        }
-        i = 4 - i;
-    }
-    return i;
-}
-
-//地毯式搜索 用于前三行 
-//找到这一行中最大的一段白线的中点
-int CarpetSearch(int row)
-{
-    int ans;
-    int len = 0, Maxlen = 0;
-    int start,end,mid=-1;
-    int i,j;
-    for (i = 0; i < Img_W; i++)
-    {
-      if (img[row][i] != 0xff)//出现白点
-      {
-        start = LeftJump(img[row][i])+i*8;//标记起点
-        for (j = i+1; j < Img_W; j++)
-        {
-          if (img[row][j] != 0x00)//出现黑点
-              break;
-        }
-        end = RightJump(img[row][j]) + j * 8;
-        ans = (int)((start + end + 0.5) / 2 );
-        i = j;
-        len = end - start;
-        if (len > Maxlen) {
-            mid = ans;
-            Maxlen = len;
-        }
-      }
-    }
-    return mid;
-}
-
-int Scan(uint8 *src)
-{
-  
 }

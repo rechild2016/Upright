@@ -1,6 +1,5 @@
 #ifndef __IMAGE_H__
 #define __IMAGE_H__
-
 #include "include.h"
 #include "image.h"
 
@@ -12,15 +11,13 @@ extern uint8   wending;
 extern uint8   biansu;
 extern uint8   biancan;
 extern uint8  zhuantou;
-#define Img_H 60
-#define Img_W 20
-
 #define SROW 60//采集图像的高
 #define SCOLUMN 160//采集图像的宽
 
 #define PROW 60//处理图像的高
 #define PCOLUMN 160//处理图像的宽
 
+//#define WIDTH 52//赛道宽度
 #define HEART PCOLUMN/2//赛道中心X坐标
 //诸多参数
 #define MAX_XDIS 10//线上相邻两点最大横向距离
@@ -29,7 +26,8 @@ extern uint8  zhuantou;
 #define MIN_CROSS_LENGTH 10//十字交叉最小长度
 #define MAX_SEARCH_HEIGHT 40//最高赛道线底部Y方向坐标
 #define CROSS_LENGTH 5
-
+#define MAX_SERVOR_VALUE 9375+2800
+#define MIN_SERVOR_VALUE 9375-2800
 //变量声明
 extern uint32 row;
 
@@ -45,6 +43,7 @@ extern uint8 *pTemp;
 extern int leftYStart, leftYEnd, rightYStart, rightYEnd, leadYStart, leadYEnd, xBase;//左线,右线和引导线的Y方向起始及终止点
 extern int leftLine[PROW];
 extern int rightLine[PROW];
+
 extern int leadLine[PROW];
 extern int ShowArray[PROW];
 extern int *leady;
@@ -53,6 +52,8 @@ extern int A,C,BC,AB,T;
 extern  float X;
 
 extern int WIDTH;
+extern uint8 STOP;
+
 
 extern int leftEdge1[PROW];
 extern int rightEdge1[PROW];
@@ -79,8 +80,7 @@ extern const uint8 mapY[PROW][PCOLUMN];
 extern const uint8 leftEdge[PROW];
 extern const uint8 rightEdge[PROW];
 extern const uint8 weightTable[PROW];
-extern int leadlength;
-extern int LineType;
+
 
 void StaticThreshold(uint8 tr,uint8 *src);//静态二值化
 //二值化部分
@@ -101,8 +101,19 @@ extern uint32 blackHoleNum;
 //预防
 extern uint8 notStopFlag;
 extern uint8 needStaticFlag;*/
-
+//联通图
+int CarpetSearch(int row);
+int RightJump(unsigned char a);
+int LeftJump(unsigned char a);
+void DFS(int x,int y);//完成
+//处理障碍
+int block_avoid(void);  ///传进去参数行数向上找，返回障碍物最低行
 //寻线部分
+int judgebigring(int black_hang_up);
+int Crossorring(uint8 *src,uint8 *pSrc); //环形
+void Crossorring_huanxing(void);
+int zwzfilter(int leadlength);
+int CarpetSearch(int row);
 void RecordBWChange(uint8 *src,uint8 *pSrc);//记录跳变沿
 //void Record(uint8 *src,uint8 *pSrc);//差分法记录跳变沿
 int SearchBaseLines(uint8 *pSrc);//两种边缘搜线
@@ -123,7 +134,6 @@ void CrossMakeUpLine(int line[], int start, int end);//十字交叉补线
 float CuvreControl(int start,int end);
 float circle(int row,int height);
 int m_sqrt(int x);
-int zwzfilter(int *p);
 int AAGAFilter(int *src);
 //引导线部分
 void CalculateLeadLine(void);//计算引导线
@@ -131,6 +141,4 @@ void CalculateLeadLine(void);//计算引导线
 //液晶部分
 void ArraySetValue(uint8 *src,uint8 value);//数组统一
 extern void LCD_line_display(Site_t site);
-void DFS(int x,int y);
-int CarpetSearch(int row);
-#endif
+#endif 

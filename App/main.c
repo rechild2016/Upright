@@ -2,7 +2,8 @@
 #include "include.h"
 
  #define ImgMap(x,y) ((img[(x)][(y)/8])>>(7-(y)%8))&0x01
-
+#define Img_H 60
+#define Img_W 20
  uint16 acc_init[5];
  uint16 gyro_init[5];
  uint16 AngleAcceleArry[6];
@@ -20,17 +21,17 @@
  int PIT0InteruptEventCount=0;
 
  extern uint8 t;        //直立模糊表下标
- float Upright_Kp[5]={14, 16.0, 16.5,13.5, 5};//直立模糊PID 16.5  15  20  10 5
+ float Upright_Kp[5]={16, 16.3, 16.5,13.5, 5};//直立模糊PID 16.5  15  20  10 5
  float Upright_Kd[5]={ 8,  8.0,    5,   4, 0};      //   11.3 8  5  4  0
  float SpeedKp=7.0;     //速度PID   4
  float SpeedKi=0.12;     //  0.4
  float DirKp=2.5;        //方向PID
  float DirKp2=3.0;        //方向PID
- float DirKd=50;
+ float DirKd=40;
  float DirSetPoint=80;        //小了往右偏  大了往左偏
    
  float CarRate=0;  
- int HighSpeed=55;
+ int HighSpeed=50;
  int LowSpeed=40;
  int CarGo=0;
  
@@ -76,9 +77,11 @@ void ParameterSet();
 void PORTA_IRQHandler();
 void DMA0_IRQHandler();
 
+int BlockModeCounter=0;//障碍计数器
+int ZebraModeCounter=0;//起跑线计数器
 void AllInit()
 {
-
+    led_init(LED0);
     CarInit();
     Parameters_Init();  
     LCD_init();
@@ -99,11 +102,11 @@ void AllInit()
     EnableInterrupts;                    //中断允许   
 }
 Site_t site     = {0, 0};                           //显示图像左上角位置
-
+uint8 Stop=0;
 void main()
 {
     
-    uint32  i=0,j=0,x=0,y=0;
+    uint32  i=0,j=0,x=0,y=0,tt=0;
     int x0;
     AllInit();                
     
@@ -162,6 +165,7 @@ void main()
         }
        
         imageProcess(p1);//图像处理
+       
         gpio_set(PTC15,0); 
         
         //显示信息参数
@@ -190,14 +194,17 @@ void main()
        }
        else{
          ParameterSet();//屏幕按键调参  
-         vcan_sendimg(imgbuff,CAMERA_SIZE);
+         
        }
         if(CarGo!=0)
         {  
-            if(CarRate<HighSpeed)
-              CarRate+=0.5;
+          if(CarRate<HighSpeed)
+            CarRate+=0.5;
+          if(tt<600 )tt++;
+     
           
-        }
+       }
+
     }
 
 }
@@ -216,12 +223,15 @@ void PIT0_IRQHandler(void)//1ms进一次中断
   
   if(PIT0InteruptEventCount==4)   //直立的控制
   {
+    if(Stop==1)motor_control(0,0);
+    else{
     Straigth();//直立控制
     motor_control(Car_Info.Upright_PWM - Car_Info.Speed_PWM - Car_Info.DirPWM,
                   Car_Info.Upright_PWM - Car_Info.Speed_PWM + Car_Info.DirPWM);
    // motor_control(Car_Info.Upright_PWM  - Car_Info.DirPWM,
     //              Car_Info.Upright_PWM  + Car_Info.DirPWM);
    // motor_control(Car_Info.Upright_PWM,Car_Info.Upright_PWM);
+    }
   }  
   else if(PIT0InteruptEventCount==3)   //陀螺仪
   {
@@ -250,10 +260,10 @@ void PIT0_IRQHandler(void)//1ms进一次中断
   
   else if(PIT0InteruptEventCount==1)//方向环
   {
-    if(leadYEnd-leadYStart < 25)DirPID.Kp=DirKp2;
+    if(leadYEnd-leadYStart < 10)DirPID.Kp=DirKp2;
     else DirPID.Kp=DirKp;
-    if(midpoint_before<60)midpoint_before=60;
-    else if(midpoint_before>100)midpoint_before=100;
+
+    DirPID.SetPoint=DirSetPoint;
      
     Car_Info.DirPWM=(int )LocPID_Calc(midpoint_before,&DirPID); 
 
@@ -329,71 +339,71 @@ void ParameterSet()
     case 0://直立kp
       {
         if(key_check(KEY_U) == KEY_DOWN)
-          Upright_Kp[t]+=0.1;
+          DirKp+=0.1;
         else if(key_check(KEY_D) == KEY_DOWN)
-           Upright_Kp[t]-=0.1;
+           DirKp-=0.1;
         
-        LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , GREEN);
-        LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_1, (int)Acc_Offset , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_1, (int)( DirKp*10) , FCOLOUR , GREEN);
+        LCD_num_C (site_y_1, (int)( DirKp2*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_1, (int)DirSetPoint , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
         break;
       }
     case 1://直立kd
       {
         if(key_check(KEY_U) == KEY_DOWN)
-           Upright_Kd[t]+=0.1;
+           DirKp2+=0.1;
         else if(key_check(KEY_D) == KEY_DOWN)
-            Upright_Kd[t]-=0.1;
-        LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , GREEN);
-        LCD_num_C (site_z_1, (int)  Acc_Offset , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , BCOLOUR);
+            DirKp2-=0.1;
+        LCD_num_C (site_x_1, (int)( DirKp*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_1, (int)( DirKp2*10) , FCOLOUR , GREEN);
+        LCD_num_C (site_z_1, (int)  DirSetPoint , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
         break;
       }
     case 2://加速度offset
       {
         if(key_check(KEY_U) == KEY_DOWN)
-          Acc_Offset++;
+          DirSetPoint++;
         else if(key_check(KEY_D) == KEY_DOWN)
-           Acc_Offset--;
-        LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_1, (int)Acc_Offset , FCOLOUR , GREEN);
-        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , BCOLOUR);
+           DirSetPoint--;
+        LCD_num_C (site_x_1, (int)( DirKp*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_1, (int)( DirKp2*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_1, (int)DirSetPoint , FCOLOUR , GREEN);
+        LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
         break;
       }
     case 3://方向kp
       {
         if(key_check(KEY_U) == KEY_DOWN)
-          DirPID.Kp+=0.1;
+          HighSpeed++;
         else if(key_check(KEY_D) == KEY_DOWN)
-          DirPID.Kp-=0.1;        
-        LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_1, (int)Acc_Offset , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR ,GREEN);
-        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , BCOLOUR);
+          HighSpeed--;        
+        LCD_num_C (site_x_1, (int)( DirKp*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_1, (int)( DirKp2*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_1, (int)DirSetPoint , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR ,GREEN);
+        LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
         break;
       }
     case 4://方向kd
       {
         if(key_check(KEY_U) == KEY_DOWN)
-          DirPID.Kd++;
+          Acc_Offset++;
         else if(key_check(KEY_D) == KEY_DOWN)
-           DirPID.Kd--;
-        LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_1, (int)Acc_Offset , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , GREEN);
+           Acc_Offset--;
+        LCD_num_C (site_x_1, (int)( DirKp*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_1, (int)( DirKp2*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_1, (int) DirSetPoint , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , GREEN);
         LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
         break;
       }
@@ -403,11 +413,11 @@ void ParameterSet()
           DirPID.SetPoint ++;
         else if(key_check(KEY_D) == KEY_DOWN)
           DirPID.SetPoint --;
-        LCD_num_C (site_x_1, (int)( Upright_Kp[t]*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_1, (int)( Upright_Kd[t]*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_1, (int)Acc_Offset , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_x_2, (int)(DirPID.Kp*10) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_y_2, (int)(DirPID.Kd) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_1, (int)( DirKp*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_1, (int)( DirKp2*10) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_1, (int) DirSetPoint , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , GREEN);
         break;
       }
