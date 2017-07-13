@@ -7,39 +7,41 @@
  #define ImgMap(x,y) ((img[(x)][(y)/8])>>(7-(y)%8))&0x01
 #define Img_H 60
 #define Img_W 20
- uint16 acc_init[5];
- uint16 gyro_init[5];
- uint16 AngleAcceleArry[6];
 
- uint8 limit=60;
+
+ uint8 limit=64;
  int lspeed=0,rspeed=0;
 
  uint8 imgbuff[CAMERA_SIZE]={1};   
  uint8 img[60][20]={0};
-
-  extern unsigned char ConGraph[Img_H][Img_W];
- int Lspeed,Rspeed;
- int Rpulse=0,Lpulse=0; //左右编码器
- int16 LPulseSum=0,RPulseSum=0;//编码器累积值
- int PIT0InteruptEventCount=0;
 
  extern uint8 t;        //直立模糊表下标
  float Upright_Kp[5]={16, 16.3, 16.5,13.5, 5};//直立模糊PID 16.5  15  20  10 5
  float Upright_Kd[5]={ 8,  8.0,    5,   4, 0};      //   11.3 8  5  4  0
  float SpeedKp=7.0;     //速度PID   4
  float SpeedKi=0.12;     //  0.4
- float DirKp=3.2;        //方向PID
- float DirKp2=3.0;        //方向PID
+ float DirKp=2.90;        //方向PID
+ float DirKp2=2.90;        //方向PID
  float DirKd=40;
- float DirSetPoint=76;        //小了往右偏  大了往左偏
+ float DirSetPoint=80;        //小了往右偏  大了往左偏
    
  float CarRate=0;  
- int HighSpeed=50;
+ int HighSpeed=42;
  int LowSpeed=40;
  int CarGo=0;
  
  extern int midpoint_before;
 
+  extern unsigned char ConGraph[Img_H][Img_W];
+ int Lspeed,Rspeed;
+ int Rpulse=0,Lpulse=0; //左右编码器
+ int16 LPulseSum=0,RPulseSum=0;//编码器累积值
+ int PIT0InteruptEventCount=0;
+ 
+  uint16 acc_init[5];
+ uint16 gyro_init[5];
+ uint16 AngleAcceleArry[6];
+ 
  float var[6];
  uint8 KeyFree=0;       //检测按键松开
  uint8 modle_key=0;
@@ -84,7 +86,7 @@ int BlockModeCounter=0;//障碍计数器
 int ZebraModeCounter=0;//起跑线计数器
 void AllInit()
 {
-    led_init(LED0);
+    led_init(LED0);led_init(LED1);
     CarInit();
     Parameters_Init();  
     LCD_init();
@@ -274,8 +276,8 @@ void PIT0_IRQHandler(void)//1ms进一次中断
   
   else if(PIT0InteruptEventCount==1)//方向环
   {
-    if(leadYEnd-leadYStart < 10)DirPID.Kp=DirKp2;
-    else DirPID.Kp=DirKp;
+    if(LineType==1)DirPID.Kp=DirKp;//直线
+    else DirPID.Kp=DirKp2;//曲线
 
     DirPID.SetPoint=DirSetPoint;
      

@@ -603,21 +603,21 @@ void CalculateLeadLine()
     //吧左右线为零的地方补线
      for (int i = leftYStart; i <= leftYEnd; i++)
         {
-              if(leftLine[i]==0)
-              leftLine[i]=leftLine_before;
-            
-              else
-              leftLine_before=leftLine[i];
+            if(leftLine[i]==0)
+            leftLine[i]=leftLine_before;
+          
+            else
+            leftLine_before=leftLine[i];
         }                     
-            for (int i = rightYStart; i <= rightYEnd; i++)
+        for (int i = rightYStart; i <= rightYEnd; i++)
         {
         
-               if(rightLine[i]==0)
-              rightLine[i]=rightLine_before;
-           
-                else
-              rightLine_before=rightLine[i];  
-      
+           if(rightLine[i]==0)
+          rightLine[i]=rightLine_before;
+       
+            else
+          rightLine_before=rightLine[i];  
+  
     
         }  
         //只有左线(完全没右线)      
@@ -641,7 +641,8 @@ void CalculateLeadLine()
           
           }
           
-          leadLine[i] = leftLine[i] +sign/abs(sign)*WIDTH / 2;
+         // leadLine[i] = leftLine[i] +sign/abs(sign)*WIDTH / 2;
+          leadLine[i] = leftLine[i] +WIDTH / 2;
           sign=0;  
         }
         
@@ -1843,8 +1844,8 @@ void Block_Judge(void)
         }
     }
   //  led (LED0,LED_ON);
-    if(BlockFlag>9)JudgeMode=1;//右边路障
-      else if(BlockFlag<-9)JudgeMode=2;//左边路障
+    if(BlockFlag>12)JudgeMode=1;//右边路障
+      else if(BlockFlag<-12)JudgeMode=2;//左边路障
       else if(ZebraLineFlag>9)JudgeMode=4;//起跑线
       else {
         JudgeMode=0;
@@ -1883,31 +1884,40 @@ void imageProcess(uint8 *src)//src校正后的图像
         
        ////////处理障碍
         led (LED0,LED_OFF);
+        led (LED1,LED_OFF);
         if(JudgeCounter==0)
-        {
-          
+        {         
              Block_Judge();
-            if(JudgeMode==1)//右边障碍
+             if (JudgeMode == 4)
+             {
+               led (LED1,LED_ON);
+                for(int i=0;i<20;i++)
+                {                  
+                  leadLine[i]=80;   
+                }
+             }
+            else if(JudgeMode==1)//右边障碍
             {
               led (LED0,LED_ON);
-                JudgeCounter=20;
+                JudgeCounter=35;
                 for(int i=0;i<20;i++)
                 {
                   if(leftLine[i]!=0)
-                  leadLine[i]=leftLine[i]+WIDTH / 4;   
+                  leadLine[i]=leftLine[i]+WIDTH / 4-1;   
                 }
             }
             else if(JudgeMode==2)//左边障碍
             {
               led (LED0,LED_ON);
-              JudgeCounter=20;
+              JudgeCounter=35;
               for(int i=0;i<20;i++)
               {
                 if(rightLine[i]!=0)
-                leadLine[i]=rightLine[i]-WIDTH / 4;  
+                leadLine[i]=rightLine[i]-WIDTH / 4+1;  
               }
             }
         }
+        //保持一段时间
         else{
           led (LED0,LED_ON);
           if(JudgeMode==1)//右边障碍
@@ -1915,7 +1925,7 @@ void imageProcess(uint8 *src)//src校正后的图像
             for(int i=0;i<20;i++)
                 {
                   if(leftLine[i]!=0)
-                  leadLine[i]=leftLine[i]+WIDTH / 4;   
+                  leadLine[i]=leftLine[i]+WIDTH / 4-1;   
                 }  
           }
           else if(JudgeMode==2)//左边障碍
@@ -1923,11 +1933,13 @@ void imageProcess(uint8 *src)//src校正后的图像
             for(int i=0;i<20;i++)
               {
                 if(rightLine[i]!=0)
-                leadLine[i]=rightLine[i]-WIDTH / 4;  
+                leadLine[i]=rightLine[i]-WIDTH / 4+1;  
               }
           } 
           JudgeCounter--;
         }
+        
+        //////////////////////曲线拟合///////////////////////////
         leadlength=leadYEnd-leadYStart;
         Cuvre[0]=CuvreControl(leadYStart+leadlength*2/3,leadYEnd);
         Cuvre[1]=CuvreControl(leadYStart+leadlength/3,leadYStart+leadlength*2/3-1);
@@ -1945,7 +1957,7 @@ void imageProcess(uint8 *src)//src校正后的图像
        
         
         Site_t site;
-        site.x = 110;
+        site.x = 100;
         site.y = 32;
         LCD_num_BC(site,midpoint_before, 3,BLUE,RED); 
         

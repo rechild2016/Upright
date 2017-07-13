@@ -14,7 +14,7 @@ TraceBufferSize=0x00010000
 TraceStallIfFIFOFull=0x00000000
 TracePortSize=0x00000004
 [DebugChecksum]
-Checksum=-994249215
+Checksum=862251011
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -27,12 +27,6 @@ MixedMode=1
 [Trace1]
 Enabled=0
 ShowSource=1
-[Disassemble mode]
-mode=0
-[Breakpoints2]
-Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\Board\src\VCAN_camera.c}.15.5" 0 0 1 "" 0 "" 0
-Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\App\Image.c}.1351.18" 0 0 1 "" 0 "" 0
-Count=2
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -40,9 +34,6 @@ Category=_ 0
 [TermIOLog]
 LoggingEnabled=_ 0
 LogFile=_ ""
-[Aliases]
-Count=0
-SuppressDialog=0
 [CallStackLog]
 Enabled=0
 [DriverProfiling]
@@ -51,3 +42,12 @@ Mode=1
 Graph=0
 Symbiont=0
 Exclusions=
+[Disassemble mode]
+mode=0
+[Breakpoints2]
+Bp0=_ 0 "EMUL_CODE" "{D:\VS程序\Freescale\光电直立校正版}.15.5" 0 0 1 "" 0 "" 0
+Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\App\Image.c}.1354.13" 0 0 1 "" 0 "" 0
+Count=2
+[Aliases]
+Count=0
+SuppressDialog=0

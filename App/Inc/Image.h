@@ -48,7 +48,7 @@ extern int rightLine[PROW];
 extern int leadLine[PROW];
 extern int ShowArray[PROW];
 extern int *leady;
-
+extern int LineType;
 extern int A,C,BC,AB,T;
 extern  float X;
 
