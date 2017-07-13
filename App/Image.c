@@ -1829,9 +1829,7 @@ void imageProcess(uint8 *src)//src校正后的图像
         int8 re;
         uint8 i;
         
-        int test[5];
-        
-        
+        int test[5];       
 
         //寻双线
         RecordBWChange (src,p2);//记录跳变沿
@@ -1854,11 +1852,8 @@ void imageProcess(uint8 *src)//src校正后的图像
         ///////处理环形弯
         huan_sign=judgebigring(20);
         if(huan_sign<20&&huan_sign>15)
-        {   //led (LED0,LED_ON);
-           // FM (1) ;
-            DELAY_MS ( 10 ) ;
-          //  FM (0) ;
-            //led (LED0,LED_OFF);
+        {  
+            DELAY_MS ( 10 ) ;          
             for(int i=0;i<20;i++)
               leadLine[i]=leftEdge[i]+WIDTH / 3;    
         }

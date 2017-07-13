@@ -112,17 +112,7 @@ void main()
     
     while(1)
     { 
-      /*//发送数据到上位机
-        var[0] = Car_Info.Speed_PWM;       //Car_Info.Acc_Smp;
-        var[1] = CarSpeed;
-        var[2]=SpeedPID.SetPoint;
-        //var[2] = Angle_Smp;
-        var[3] = Angle_dot_Smp;
-        var[4] = -Angle;                //最终角度
-        var[5] =  Angle_dot;            //最终角速度
-        //vcan_sendware((uint8_t *)var, sizeof(var));//上位机发送函数
-        */
-       // motor_control(lspeed,rspeed);
+   
         gpio_set(PTC15,1);
         camera_get_img();       //摄像头获取图像到imgbuff[CAMERA_SIZE]   //用时10ms
          for(i=0;i<Img_H;i++)

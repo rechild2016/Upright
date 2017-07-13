@@ -31,7 +31,7 @@
  }
 void Parameters_Init()
 {      
-    Acc_Offset = 1075;        //给小了稳定后车后倾，大了前倾 1085 1090 ！！！！！！！！！！！！
+    Acc_Offset = 1082;        //给小了稳定后车后倾，大了前倾 1085 1090 ！！！！！！！！！！！！
     Gyro_Offset = 1725;      //1680    ！！！！！
    
     Acc_Smp = Acc_Offset;
