@@ -141,4 +141,6 @@ void CalculateLeadLine(void);//计算引导线
 //液晶部分
 void ArraySetValue(uint8 *src,uint8 value);//数组统一
 extern void LCD_line_display(Site_t site);
+
+void Block_Judge(void);
 #endif 

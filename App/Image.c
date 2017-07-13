@@ -4,6 +4,7 @@
 
 #include "arm_math.h"
 
+
 uint8   stopflag=0;
 uint8   startgogo=0;
 uint8   zhili=0;
@@ -1779,48 +1780,98 @@ int Crossorring(uint8 *src,uint8 *pSrc)
 				return 1;//直入直角
 			}
 		}	
-	}
-	/*else if(leftYStart != -1&&rightYStart == -1)//只有左线
-	{		
-		midY=GetBiasDownRAngleX(leftLine, leftYStart, leftYEnd);
-		if(midY!=-1)
-		{
-			
-			float *abf = GetLSMatchingLine(leftLine, leftYStart, midY);
-            a=abf[0];
-			float *abb = GetLSMatchingLine(leftLine, midY+1, leftYEnd);
-            b=abb[0];
-			Angle=a*b;
-			if(Angle<-3)return 2;//斜入环
-			else if(-3<Angle<0) return 3;//斜入十字
-			else return -1;
-                       
-		}
-		else return -1;
-	}*/
-	/*else if(leftYStart == -1&&rightYStart != -1)//只有右线
-	{
-		midY=GetBiasDownRAngle(rightLine, rightYStart, rightYEnd);
-		if(midY!=-1)
-		{
-			
-			float *abf = GetLSMatchingLine(rightLine, rightYStart, midY);
-            a=abf[0];
-			float *abb = GetLSMatchingLine(rightLine, midY+1, rightYEnd);
-            b=abb[0];
-			Angle=a*b;
-			if(Angle<-3)return 2;//斜入环
-			else if(-3<Angle<0) return 3;//斜入十字
-			else return -1;                       
-		}
-		else return -1;
-	}*/
+        }
 	else return -1;
 }
 
+int CarpetSearch2(int row,int *WLength,int *BLength,int *WMid)
+{
+    int ans=0;
+    int num = 0;
+    int start, end, mid = 0;
+    int i, j;
+    int COL_START=leftEdge[row];
+    int COL_END=rightEdge[row];
+    for (i = COL_START; i < COL_END; i++)
+    {
+        if (processBuf1[row][i] != 0 && processBuf1[row][i+1] != 0)//<B3><F6><CF>??<E3>
+        {
+            num++;//<B0><D7><CF>?<CE><CA><FD><C1><BF><D4><F6><BC><D3>
+            start =  i ;//<B1><EA><BC><C7><C6><F0><B5><E3>
+            for (j = i + 1; j < COL_END; j++)
+            {
+              if (processBuf1[row][j] == 0 && processBuf1[row][j+1] == 0)//<B3><F6><CF>??<E3>
+                  break;
+            }
+            end = j;
+            ans = (int)((start + end + 0.5) / 2);
+            WLength[num-1]=end - start;
+            WMid[num-1]=ans;
 
+           i = j;
+        }
+        else if(processBuf1[row][i] == 0 && processBuf1[row][i+1] == 0)//<B3><F6><CF>??<E3>
+        {
+            start =  i ;//<B1><EA><BC><C7><C6><F0><B5><E3>
+           for (j = i + 1; j < COL_END; j++)
+            {
+              if (processBuf1[row][j] != 0 && processBuf1[row][j+1] != 0)//<B3><F6><CF>??<E3>
+                  break;
+            }
+            end = j;
+           BLength[num]=end - start;
+           i=j;
+        }
+        if(num>9)break;
+    }
+    return num;
+}
 
+//障碍处理 
+uint8 ZebraLineFlag=0;//起跑线标志位
+uint8 BlockFlag=0;//障碍标记位
+uint8 EnterSamllAnn=0;//进入小圆环判断
+int ExportFlag=0;//环形弯出口
+int JudgeMode=0;//判定结果
+int lineNum[30];
+int WLength[30][10];
+int BLength[30][10];
+int WMid[30][10];
 
+void Block_Judge(void)
+{
+    int t=0;
+    ZebraLineFlag=0;
+    BlockFlag=0;
+    EnterSamllAnn=0;
+    ExportFlag=0;
+    memset(lineNum,0,sizeof(lineNum));//清零
+    memset(WLength,0,sizeof(WLength));
+    memset(BLength,0,sizeof(BLength));
+    memset(WMid,0,sizeof(WMid));
+    for(int i=20;i<50;i++)//从倒数第十行采集 采集30行
+    {
+        t=i-20;
+        lineNum[t]=CarpetSearch2(i,WLength[t],BLength[t],WMid[t]);
+        if(lineNum[t]>=4)//起跑线判定数量
+          ZebraLineFlag++;
+        else if(lineNum[t]==2)//两段白线 可能是入环 、入环 或者障碍物
+        {
+           if((WLength[t][0]-WLength[t][1])>30)BlockFlag++;
+           else if((WLength[t][1]-WLength[t][0])>30)BlockFlag--;
+        }
+    }
+    led (LED0,LED_ON);
+    if(BlockFlag>9)JudgeMode=1;//右边路障
+      else if(BlockFlag<-9)JudgeMode=2;//左边路障
+      else if(ZebraLineFlag>9)JudgeMode=4;//起跑线
+      else {
+        JudgeMode=0;
+        led (LED0,LED_OFF);
+      }
+}
+
+int JudgeCounter=0;
 //图像处理算法
 /***********************************/
 uint8 tr,staticTr;
@@ -1859,16 +1910,31 @@ void imageProcess(uint8 *src)//src校正后的图像
         }
         
        ////////处理障碍
-        block_hang=block_avoid();
-        if(block_hang>10)
+        if(JudgeCounter==0)
         {
-           // FM (1) ;
-            DELAY_MS ( 40 ) ;
-           // FM (0) ;
-        
-    
+             Block_Judge();
+            if(JudgeMode==1)//右边障碍
+            {
+                JudgeCounter=20;
+            }
+            else if(JudgeMode==2)//左边障碍
+            {
+              JudgeCounter=20;
+              
+            }
         }
-      
+        else{
+          if(JudgeMode==1)
+          {
+            for(int i=0;i<20;i++)
+              leadLine[i]=leftEdge[i]+WIDTH / 3;   
+          }
+          else if(JudgeMode==2)
+          {
+            for(int i=0;i<20;i++)
+              leadLine[i]=rightEdge[i]+WIDTH / 3;   
+          } 
+        }
         leadlength=leadYEnd-leadYStart;
         Cuvre[0]=CuvreControl(leadYStart+leadlength*2/3,leadYEnd);
         Cuvre[1]=CuvreControl(leadYStart+leadlength/3,leadYStart+leadlength*2/3-1);
@@ -1926,21 +1992,11 @@ int block_avoid(void)
 
 
 
+
 void Crossorring_huanxing(void)
 { 
   int i,j;
- /*// int leadLine_T[PROW];
-  for(i=0;i<40;i++)
-  {
-    for(j=leftEdge[i]-2;j<80;j++)
-       {
-            if(processBuf1[i][j]==0&&processBuf1[i][j+1]==255)
-            {leadLine[i] =j+ WIDTH / 2;
-            break;
-              }
-      
-        } 
-  */
+
    // leftYStart = -1; rightYStart = -1; leftYEnd = -1; rightYEnd = -1; leadYStart = -1; leadYEnd = -1;
     if(((rightYEnd-leftYStart)+(leadYEnd-rightYStart)+(leftYEnd-leadYStart))<6&&leadYEnd<16&&rightYEnd<16&&leftYEnd<16&&leadYEnd>5&&rightYEnd>5&&leftYEnd>5)     
     { 
@@ -1951,18 +2007,7 @@ void Crossorring_huanxing(void)
            DELAY_MS ( 100 ) ;
            FM (0) ;
       }
-    } 
-    
-    
-    /*
-      for(i=0;i<PROW;i++)
-    {if(processBuf1[i][80]&&processBuf1[i][79])
-      
-      
-    }
-  */
-       
- 
+    }  
 
 }
 ///////////判断大圆环，有全黑的行数
@@ -2114,3 +2159,4 @@ void LCD_line_display(Site_t site)
         LCD_point(site, BLUE);
     }
 }
+
