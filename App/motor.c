@@ -4,8 +4,8 @@
 #include "MK60_port.h"
 #include "MK60_gpio.h"
 
-#define LDeath 100               //易变
-#define RDeath 90
+#define LDeath 105               //易变
+#define RDeath 85
 
 void motor_init()
 {    

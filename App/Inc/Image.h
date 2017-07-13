@@ -29,6 +29,7 @@ extern uint8  zhuantou;
 #define MAX_SERVOR_VALUE 9375+2800
 #define MIN_SERVOR_VALUE 9375-2800
 //±äÁ¿ÉùÃ÷
+extern int JudgeMode;
 extern uint32 row;
 
 extern uint8 processReady;

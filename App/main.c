@@ -1,6 +1,9 @@
 #include "common.h"
 #include "include.h"
+/**************************************************
 
+瑞哥的程序 加了避障和停车
+******************************************************/
  #define ImgMap(x,y) ((img[(x)][(y)/8])>>(7-(y)%8))&0x01
 #define Img_H 60
 #define Img_W 20
@@ -25,10 +28,10 @@
  float Upright_Kd[5]={ 8,  8.0,    5,   4, 0};      //   11.3 8  5  4  0
  float SpeedKp=7.0;     //速度PID   4
  float SpeedKi=0.12;     //  0.4
- float DirKp=2.8;        //方向PID
+ float DirKp=3.2;        //方向PID
  float DirKp2=3.0;        //方向PID
  float DirKd=40;
- float DirSetPoint=80;        //小了往右偏  大了往左偏
+ float DirSetPoint=76;        //小了往右偏  大了往左偏
    
  float CarRate=0;  
  int HighSpeed=50;
@@ -101,8 +104,13 @@ void AllInit()
     pit_init_ms(PIT0,1);                //初始化PIT0，定时时间为： 5ms
     EnableInterrupts;                    //中断允许   
 }
+
 Site_t site     = {0, 0};                           //显示图像左上角位置
 uint8 Stop=0;
+int Stopt=0;
+int RoadMode=0;
+int CarStop=0;
+
 void main()
 {
     
@@ -157,7 +165,23 @@ void main()
         imageProcess(p1);//图像处理
        
         gpio_set(PTC15,0); 
-        
+        if(JudgeMode==4)
+        { 
+          if( RoadMode!=4)//起跑线
+            RoadMode=4;
+          else if(CarStop==1)
+          {
+           Stopt=1;
+          }
+        }
+        else RoadMode=0;
+        if(Stopt>0)
+        {
+          if(Stopt<60)Stopt++;
+          else{
+            STOP=1;//彻底停车
+          }
+        }
         //显示信息参数
        if(key_check(KEY_B) == KEY_DOWN)
        {       
@@ -167,16 +191,16 @@ void main()
        }
        if(LCDShowMode)
        {
-         /*if(key_check(KEY_U) == KEY_DOWN)
+         if(key_check(KEY_U) == KEY_DOWN)
          {
-           DirSetPoint++;
-           SCCB_WriteByte(OV7725_CNST,DirSetPoint); 
+           limit++;
+           SCCB_WriteByte(OV7725_CNST,limit);
          }
          else if(key_check(KEY_D) == KEY_DOWN)
          {
-           DirSetPoint--;
-           SCCB_WriteByte(OV7725_CNST,DirSetPoint);          //设置阈值
-         }*/
+           limit--;
+           SCCB_WriteByte(OV7725_CNST,limit);          //设置阈值
+         }
          LCD_Img_gray_Z(site_1, size_2, (uint8*)p1, imgsize);//显示解压后的初始图像
          LCD_line_display(site_1);
          LCD_num_C(site2,leadYEnd-leadYStart,FCOLOUR,BCOLOUR);
@@ -191,7 +215,7 @@ void main()
           if(CarRate<HighSpeed)
             CarRate+=0.5;
           if(tt<600 )tt++;
-     
+            else CarStop=1;//允许停车
           
        }
 
@@ -213,7 +237,7 @@ void PIT0_IRQHandler(void)//1ms进一次中断
   
   if(PIT0InteruptEventCount==4)   //直立的控制
   {
-    if(Stop==1)motor_control(0,0);
+    if(STOP==1)motor_control(0,0);
     else{
     Straigth();//直立控制
     motor_control(Car_Info.Upright_PWM - Car_Info.Speed_PWM - Car_Info.DirPWM,
@@ -338,7 +362,7 @@ void ParameterSet()
         LCD_num_C (site_z_1, (int)DirSetPoint , FCOLOUR , BCOLOUR);
         LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_2, (int)(limit) , FCOLOUR , BCOLOUR);
         break;
       }
     case 1://直立kd
@@ -352,7 +376,7 @@ void ParameterSet()
         LCD_num_C (site_z_1, (int)  DirSetPoint , FCOLOUR , BCOLOUR);
         LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_2, (int)(limit) , FCOLOUR , BCOLOUR);
         break;
       }
     case 2://加速度offset
@@ -366,7 +390,7 @@ void ParameterSet()
         LCD_num_C (site_z_1, (int)DirSetPoint , FCOLOUR , GREEN);
         LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_2, (int)(limit) , FCOLOUR , BCOLOUR);
         break;
       }
     case 3://方向kp
@@ -380,7 +404,7 @@ void ParameterSet()
         LCD_num_C (site_z_1, (int)DirSetPoint , FCOLOUR , BCOLOUR);
         LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR ,GREEN);
         LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_2, (int)(limit) , FCOLOUR , BCOLOUR);
         break;
       }
     case 4://方向kd
@@ -394,21 +418,21 @@ void ParameterSet()
         LCD_num_C (site_z_1, (int) DirSetPoint , FCOLOUR , BCOLOUR);
         LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , GREEN);
-        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , BCOLOUR);
+        LCD_num_C (site_z_2, (int)(limit) , FCOLOUR , BCOLOUR);
         break;
       }
     case 5://方向setpoint
       {
         if(key_check(KEY_U) == KEY_DOWN)
-          DirPID.SetPoint ++;
+          limit++;
         else if(key_check(KEY_D) == KEY_DOWN)
-          DirPID.SetPoint --;
+          limit--;
         LCD_num_C (site_x_1, (int)( DirKp*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_y_1, (int)( DirKp2*10) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_z_1, (int) DirSetPoint , FCOLOUR , BCOLOUR);
         LCD_num_C (site_x_2, (int)(HighSpeed) , FCOLOUR , BCOLOUR);
         LCD_num_C (site_y_2, (int)(Acc_Offset) , FCOLOUR , BCOLOUR);
-        LCD_num_C (site_z_2, (int)(DirPID.SetPoint) , FCOLOUR , GREEN);
+        LCD_num_C (site_z_2, (int)(limit) , FCOLOUR , GREEN);
         break;
       }
     }
@@ -420,4 +444,5 @@ void ParameterSet()
   else KeyFree=0;
  
 }
+
 

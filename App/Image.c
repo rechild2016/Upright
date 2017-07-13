@@ -80,7 +80,7 @@ void ArraySetValue(uint8 *src,uint8 value)
     }
 } 
 //加权递推平均滤波
-int     AAGAFilter(int *src)
+int AAGAFilter(int *src)
 { 
  
    int i=0,Value=0;
@@ -321,25 +321,13 @@ int SearchBaseLines(uint8 *pSrc)//P2
         }
         else if (leftCnt != 0 && rightCnt != 0)//左右都有线
         {
-
-		    /*leftYStart = i;
-		    leftYEnd = i;
-		    leftLine[i] = leftHalf[0];
-		    rightYStart = i;
-		    rightYEnd = i;
-		    rightLine[i] = rightHalf[0];*/
-		     for (m = 0; m < leftCnt; m++)
+            for (m = 0; m < leftCnt; m++)
             {
                 for (n = 0; n < rightCnt; n++)
                 {
                     t1 = rightHalf[n] - leftHalf[m];//左右点间距
                     //1cm  为1.3个点
                     //感觉此方法得进行校正后使用 
-                    /*if(t1<WIDTH - 8)
-                    {
-                    	lie++;
-						if(lie>=2)STOP=1;
-                    }*/
                     
                     if (t1 < WIDTH + 8 && t1 > WIDTH - 8)//间距在赛道间距范围内  
                     {
@@ -738,9 +726,6 @@ void CalculateLeadLine()
         //阴阳协调
         else
         {
-            //FM ( 1) ;    
-            //DELAY_MS ( 150 ) ;
-            //FM ( 0 ) ;
            
             y1 = leftYStart<rightYStart?leftYStart:rightYStart;//S小
             y2 = leftYStart<rightYStart?rightYStart:leftYStart;//S大
@@ -761,9 +746,7 @@ void CalculateLeadLine()
                 sign++;
            else 
                 sign--;
-            
-           
-           
+              
            }
           
           leadLine[i] = leftLine[i] +sign/abs(sign)*WIDTH / 2;
@@ -1522,9 +1505,9 @@ float CuvreControl(int start,int end)
 
   if (start>end)
   {
-  T=start;
-  start=end;
-  end=T;
+    T=start;
+    start=end;
+    end=T;
   }
     
   A=leadLine[start];
@@ -1794,13 +1777,13 @@ int CarpetSearch2(int row,int *WLength,int *BLength,int *WMid)
     int COL_END=rightEdge[row];
     for (i = COL_START; i < COL_END; i++)
     {
-        if (processBuf1[row][i] != 0 && processBuf1[row][i+1] != 0)//<B3><F6><CF>??<E3>
+        if (processBuf1[row][i] != 0 )//<B3><F6><CF>??<E3>
         {
-            num++;//<B0><D7><CF>?<CE><CA><FD><C1><BF><D4><F6><BC><D3>
-            start =  i ;//<B1><EA><BC><C7><C6><F0><B5><E3>
+            num++;
+            start =  i ;
             for (j = i + 1; j < COL_END; j++)
             {
-              if (processBuf1[row][j] == 0 && processBuf1[row][j+1] == 0)//<B3><F6><CF>??<E3>
+              if (processBuf1[row][j] == 0 )//<B3><F6><CF>??<E3>
                   break;
             }
             end = j;
@@ -1810,12 +1793,12 @@ int CarpetSearch2(int row,int *WLength,int *BLength,int *WMid)
 
            i = j;
         }
-        else if(processBuf1[row][i] == 0 && processBuf1[row][i+1] == 0)//<B3><F6><CF>??<E3>
+        else if(processBuf1[row][i] == 0 )//<B3><F6><CF>??<E3>
         {
             start =  i ;//<B1><EA><BC><C7><C6><F0><B5><E3>
            for (j = i + 1; j < COL_END; j++)
             {
-              if (processBuf1[row][j] != 0 && processBuf1[row][j+1] != 0)//<B3><F6><CF>??<E3>
+              if (processBuf1[row][j] != 0 )//<B3><F6><CF>??<E3>
                   break;
             }
             end = j;
@@ -1828,10 +1811,9 @@ int CarpetSearch2(int row,int *WLength,int *BLength,int *WMid)
 }
 
 //障碍处理 
-uint8 ZebraLineFlag=0;//起跑线标志位
-uint8 BlockFlag=0;//障碍标记位
-uint8 EnterSamllAnn=0;//进入小圆环判断
-int ExportFlag=0;//环形弯出口
+int ZebraLineFlag=0;//起跑线标志位
+int BlockFlag=0;//障碍标记位
+
 int JudgeMode=0;//判定结果
 int lineNum[30];
 int WLength[30][10];
@@ -1843,31 +1825,30 @@ void Block_Judge(void)
     int t=0;
     ZebraLineFlag=0;
     BlockFlag=0;
-    EnterSamllAnn=0;
-    ExportFlag=0;
+    
     memset(lineNum,0,sizeof(lineNum));//清零
     memset(WLength,0,sizeof(WLength));
     memset(BLength,0,sizeof(BLength));
     memset(WMid,0,sizeof(WMid));
-    for(int i=20;i<50;i++)//从倒数第十行采集 采集30行
+    for(int i=25;i<55;i++)//从倒数第十行采集 采集30行
     {
-        t=i-20;
+        t=i-25;
         lineNum[t]=CarpetSearch2(i,WLength[t],BLength[t],WMid[t]);
         if(lineNum[t]>=4)//起跑线判定数量
           ZebraLineFlag++;
         else if(lineNum[t]==2)//两段白线 可能是入环 、入环 或者障碍物
         {
-           if((WLength[t][0]-WLength[t][1])>30)BlockFlag++;
-           else if((WLength[t][1]-WLength[t][0])>30)BlockFlag--;
+           if((WLength[t][0]-WLength[t][1])>20)BlockFlag++;
+           else if((WLength[t][1]-WLength[t][0])>20)BlockFlag--;
         }
     }
-    led (LED0,LED_ON);
+  //  led (LED0,LED_ON);
     if(BlockFlag>9)JudgeMode=1;//右边路障
       else if(BlockFlag<-9)JudgeMode=2;//左边路障
       else if(ZebraLineFlag>9)JudgeMode=4;//起跑线
       else {
         JudgeMode=0;
-        led (LED0,LED_OFF);
+        
       }
 }
 
@@ -1887,17 +1868,8 @@ void imageProcess(uint8 *src)//src校正后的图像
 
         
         re=SearchBaseLines(p2);//寻双线
-        
-        //if(re==-1) ArraySetValue(p2,255);
-         // re=RemoveNoise(1);//移除噪音
-        //if(re==-1) ArraySetValue(p2,255);
-        //十字交叉
-        //引导线
-        //re=RemoveNoise(2);//移除噪音
-        //if(re==-1) ArraySetValue(p2,255);
         CrossRecognize(p1,p2);
         
-       
         //xyz=Crossorring(p1,p2);
         CalculateLeadLine();//计算引导线 
         ///////处理环形弯
@@ -1910,30 +1882,51 @@ void imageProcess(uint8 *src)//src校正后的图像
         }
         
        ////////处理障碍
+        led (LED0,LED_OFF);
         if(JudgeCounter==0)
         {
+          
              Block_Judge();
             if(JudgeMode==1)//右边障碍
             {
+              led (LED0,LED_ON);
                 JudgeCounter=20;
+                for(int i=0;i<20;i++)
+                {
+                  if(leftLine[i]!=0)
+                  leadLine[i]=leftLine[i]+WIDTH / 4;   
+                }
             }
             else if(JudgeMode==2)//左边障碍
             {
+              led (LED0,LED_ON);
               JudgeCounter=20;
-              
+              for(int i=0;i<20;i++)
+              {
+                if(rightLine[i]!=0)
+                leadLine[i]=rightLine[i]-WIDTH / 4;  
+              }
             }
         }
         else{
-          if(JudgeMode==1)
+          led (LED0,LED_ON);
+          if(JudgeMode==1)//右边障碍
           {
             for(int i=0;i<20;i++)
-              leadLine[i]=leftEdge[i]+WIDTH / 3;   
+                {
+                  if(leftLine[i]!=0)
+                  leadLine[i]=leftLine[i]+WIDTH / 4;   
+                }  
           }
-          else if(JudgeMode==2)
+          else if(JudgeMode==2)//左边障碍
           {
             for(int i=0;i<20;i++)
-              leadLine[i]=rightEdge[i]+WIDTH / 3;   
+              {
+                if(rightLine[i]!=0)
+                leadLine[i]=rightLine[i]-WIDTH / 4;  
+              }
           } 
+          JudgeCounter--;
         }
         leadlength=leadYEnd-leadYStart;
         Cuvre[0]=CuvreControl(leadYStart+leadlength*2/3,leadYEnd);
@@ -1970,12 +1963,12 @@ int block_avoid(void)
    for(i=block_hang+2;i<block_hang+5;i++)
      {    wide_hang=leftLine[i]-leftLine[i]-3;
 	 for(j=leftLine[block_hang]+1;j<rightLine[block_hang];j++)
-	 	{
-                     if(processBuf1[i][j]==255)
-		  	{
-                         white_sign++;                          
-                        }
-                }
+          {
+             if(processBuf1[i][j]==255)
+             {
+                 white_sign++;                          
+             }
+          }
           if(white_sign>=wide_hang)
           {
            usefull_hang++;
@@ -1988,8 +1981,6 @@ int block_avoid(void)
    return 0;
 
 }
-
-
 
 
 
@@ -2020,19 +2011,17 @@ int judgebigring(int black_hang_up)
         int plot_sign;
         //加判断条件，节约时间  最顶行为全黑，最低行为全白
         for(uint8 y=leftEdge[1]+1;y<rightEdge[1]-1; y++)
-        {
-          
-        if (processBuf1[1][y]==255)//0是黑，255白 
-          {
-            plot_sign++;
-            if(plot_sign>4)
-             return 0;                       
-          } 
+        {         
+          if (processBuf1[1][y]==255)//0是黑，255白 
+            {
+              plot_sign++;
+              if(plot_sign>4)
+               return 0;                       
+            } 
         }
         for(uint8 y=leftEdge[58]+1;y<rightEdge[58]-1; y++)
-        {
-          
-        if (processBuf1[58][y]==0)//0是黑，255白 
+        {         
+          if (processBuf1[58][y]==0)//0是黑，255白 
           {
                plot_sign++;
             if(plot_sign>4)
