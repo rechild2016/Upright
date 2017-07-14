@@ -1,9 +1,5 @@
 #include "common.h"
 #include "include.h"
-/**************************************************
-
-Èğ¸çµÄ³ÌĞò ¼ÓÁË±ÜÕÏºÍÍ£³µ
-******************************************************/
  #define ImgMap(x,y) ((img[(x)][(y)/8])>>(7-(y)%8))&0x01
 #define Img_H 60
 #define Img_W 20
@@ -15,18 +11,18 @@
  uint8 imgbuff[CAMERA_SIZE]={1};   
  uint8 img[60][20]={0};
 
- extern uint8 t;        //Ö±Á¢Ä£ºı±íÏÂ±ê
- float Upright_Kp[5]={16, 16.3, 16.5,13.5, 5};//Ö±Á¢Ä£ºıPID 16.5  15  20  10 5
+ extern uint8 t;        //ç›´ç«‹æ¨¡ç³Šè¡¨ä¸‹æ ‡
+ float Upright_Kp[5]={16, 16.3, 16.5,13.5, 5};//ç›´ç«‹æ¨¡ç³ŠPID 16.5  15  20  10 5
  float Upright_Kd[5]={ 8,  8.0,    5,   4, 0};      //   11.3 8  5  4  0
- float SpeedKp=7.0;     //ËÙ¶ÈPID   4
+ float SpeedKp=7.0;     //é€Ÿåº¦PID   4
  float SpeedKi=0.12;     //  0.4
- float DirKp=2.90;        //·½ÏòPID
- float DirKp2=2.90;        //·½ÏòPID
+ float DirKp=2.90;        //æ–¹å‘PID
+ float DirKp2=2.90;        //æ–¹å‘PID
  float DirKd=40;
- float DirSetPoint=80;        //Ğ¡ÁËÍùÓÒÆ«  ´óÁËÍù×óÆ«
+ float DirSetPoint=79;        //å°äº†å¾€å³å  å¤§äº†å¾€å·¦å
    
  float CarRate=0;  
- int HighSpeed=42;
+ int HighSpeed=52;
  int LowSpeed=40;
  int CarGo=0;
  
@@ -34,8 +30,8 @@
 
   extern unsigned char ConGraph[Img_H][Img_W];
  int Lspeed,Rspeed;
- int Rpulse=0,Lpulse=0; //×óÓÒ±àÂëÆ÷
- int16 LPulseSum=0,RPulseSum=0;//±àÂëÆ÷ÀÛ»ıÖµ
+ int Rpulse=0,Lpulse=0; //å·¦å³ç¼–ç å™¨
+ int16 LPulseSum=0,RPulseSum=0;//ç¼–ç å™¨ç´¯ç§¯å€¼
  int PIT0InteruptEventCount=0;
  
   uint16 acc_init[5];
@@ -43,21 +39,21 @@
  uint16 AngleAcceleArry[6];
  
  float var[6];
- uint8 KeyFree=0;       //¼ì²â°´¼üËÉ¿ª
+ uint8 KeyFree=0;       //æ£€æµ‹æŒ‰é”®æ¾å¼€
  uint8 modle_key=0;
  uint8 LCDShowMode=0;
  
- extern PID_t StraigthPID;      //Ö±Á¢PID
- extern PID_t SpeedPID;         //ËÙ¶ÈPID
- extern PID_t DirPID;           //·½ÏòPID
+ extern PID_t StraigthPID;      //ç›´ç«‹PID
+ extern PID_t SpeedPID;         //é€Ÿåº¦PID
+ extern PID_t DirPID;           //æ–¹å‘PID
  extern Car_Info_t Car_Info;
  
- extern float Acc_Offset;       //¼ÓËÙ¶È¼ÆÆ«ÒÆÁ¿
- extern float Gyro_Offset;	 //ÍÓÂİÒÇÆ«ÒÆÁ¿ 
- extern float Angle_Smp;        //½Ç¶È²É¼¯
- extern float Angle_dot_Smp;    //½ÇËÙ¶È²É¼¯
+ extern float Acc_Offset;       //åŠ é€Ÿåº¦è®¡åç§»é‡
+ extern float Gyro_Offset;	 //é™€èºä»ªåç§»é‡ 
+ extern float Angle_Smp;        //è§’åº¦é‡‡é›†
+ extern float Angle_dot_Smp;    //è§’é€Ÿåº¦é‡‡é›†
   
- extern float Angle;            //½Ç¶È
+ extern float Angle;            //è§’åº¦
  extern float Angle_dot;   
  extern float EX_Angle;
  extern float EX_DeltaAngle;
@@ -73,7 +69,7 @@
   Site_t site_w_2 ={32,70};
   Site_t site1     = {80, 90};
   Site_t site2     = {7, 30};
-  Size_t imgsize  = {CAMERA_W, CAMERA_H};             //Í¼Ïñ´óĞ¡
+  Size_t imgsize  = {CAMERA_W, CAMERA_H};             //å›¾åƒå¤§å°
   Size_t size_2   = {CAMERA_W*0.8, CAMERA_H};
   Site_t site_1   = {0, 60};  
 
@@ -82,8 +78,8 @@ void ParameterSet();
 void PORTA_IRQHandler();
 void DMA0_IRQHandler();
 
-int BlockModeCounter=0;//ÕÏ°­¼ÆÊıÆ÷
-int ZebraModeCounter=0;//ÆğÅÜÏß¼ÆÊıÆ÷
+int BlockModeCounter=0;//éšœç¢è®¡æ•°å™¨
+int ZebraModeCounter=0;//èµ·è·‘çº¿è®¡æ•°å™¨
 void AllInit()
 {
     led_init(LED0);led_init(LED1);
@@ -91,23 +87,24 @@ void AllInit()
     Parameters_Init();  
     LCD_init();
     camera_init(imgbuff); 
-    SCCB_WriteByte(OV7725_CNST,limit);          //ÉèÖÃãĞÖµ
+    
+    SCCB_WriteByte(OV7725_CNST,limit);          //è®¾ç½®é˜ˆå€¼
     ftm_quad_init(FTM1);     
     ftm_quad_init(FTM2); 
     motor_init();
     uart_init(UART4,115200);
     gpio_init(PTC15,GPO,0);
     
-    set_vector_handler(PORTA_VECTORn , PORTA_IRQHandler);   //ÉèÖÃLPTMRµÄÖĞ¶Ï·şÎñº¯ÊıÎª PORTA_IRQHandler
-    set_vector_handler(DMA0_VECTORn , DMA0_IRQHandler);     //ÉèÖÃLPTMRµÄÖĞ¶Ï·şÎñº¯ÊıÎª PORTA_IRQHandler 
+    set_vector_handler(PORTA_VECTORn , PORTA_IRQHandler);   //è®¾ç½®LPTMRçš„ä¸­æ–­æœåŠ¡å‡½æ•°ä¸º PORTA_IRQHandler
+    set_vector_handler(DMA0_VECTORn , DMA0_IRQHandler);     //è®¾ç½®LPTMRçš„ä¸­æ–­æœåŠ¡å‡½æ•°ä¸º PORTA_IRQHandler 
     set_vector_handler(PIT0_VECTORn ,PIT0_IRQHandler); 
     
     enable_irq(PIT0_IRQn);
-    pit_init_ms(PIT0,1);                //³õÊ¼»¯PIT0£¬¶¨Ê±Ê±¼äÎª£º 5ms
-    EnableInterrupts;                    //ÖĞ¶ÏÔÊĞí   
+    pit_init_ms(PIT0,1);                //åˆå§‹åŒ–PIT0ï¼Œå®šæ—¶æ—¶é—´ä¸ºï¼š 5ms
+    EnableInterrupts;                    //ä¸­æ–­å…è®¸   
 }
 
-Site_t site     = {0, 0};                           //ÏÔÊ¾Í¼Ïñ×óÉÏ½ÇÎ»ÖÃ
+Site_t site     = {0, 0};                           //æ˜¾ç¤ºå›¾åƒå·¦ä¸Šè§’ä½ç½®
 uint8 Stop=0;
 int Stopt=0;
 int RoadMode=0;
@@ -124,7 +121,7 @@ void main()
     { 
    
         gpio_set(PTC15,1);
-        camera_get_img();       //ÉãÏñÍ·»ñÈ¡Í¼Ïñµ½imgbuff[CAMERA_SIZE]   //ÓÃÊ±10ms
+        camera_get_img();       //æ‘„åƒå¤´è·å–å›¾åƒåˆ°imgbuff[CAMERA_SIZE]   //ç”¨æ—¶10ms
          for(i=0;i<Img_H;i++)
           for(j=0;j<Img_W;j++)
             img[i][j]=imgbuff[i*20+j];
@@ -135,12 +132,12 @@ void main()
           x0=CarpetSearch(59-i);
           if(x0>10 && x0<150)
           {
-            DFS(59-i,(x0+7)/8);
+            DFS(59-i,(x0+7)/8);//å¯¹åˆé€‚çš„ç™½è‰²å›¾åƒæœç´¢è¿é€šåŒºåŸŸ
             break;
           }
        }
        
-       for(i=0;i<60;i++)//·ÇÁ¬Í¨ÇøÓòÌîºÚ
+       for(i=0;i<60;i++)//éè¿é€šåŒºåŸŸå¡«é»‘
         {
           for(j=0;j<20;j++)
           {
@@ -152,11 +149,11 @@ void main()
             imgbuff[i*20+j]=img[i][j];
           }
         }
-        img_extract((uint8 *) ImageBuffer2, (uint8 *) imgbuff, 60*20);//½âÑ¹Í¼Ïñ
+        img_extract((uint8 *) ImageBuffer2, (uint8 *) imgbuff, 60*20);//è§£å‹å›¾åƒ
         ImageBuffer2[59][0]=0;
-        for(i=0;i<PROW;i++)//ĞĞ  Í¼ÏñĞ£Õı
+        for(i=0;i<PROW;i++)//è¡Œ  å›¾åƒæ ¡æ­£
         {
-            for(j=0;j<PCOLUMN;j++)//ÁĞ
+            for(j=0;j<PCOLUMN;j++)//åˆ—
             {
                 x=mapX[i][j];
                 y=59-mapY[i][j];
@@ -164,12 +161,12 @@ void main()
             }
         }
        
-        imageProcess(p1);//Í¼Ïñ´¦Àí
+        imageProcess(p1);//å›¾åƒå¤„ç†
        
         gpio_set(PTC15,0); 
         if(JudgeMode==4)
         { 
-          if( RoadMode!=4)//ÆğÅÜÏß
+          if( RoadMode!=4)//èµ·è·‘çº¿
             RoadMode=4;
           else if(CarStop==1)
           {
@@ -181,13 +178,13 @@ void main()
         {
           if(Stopt<60)Stopt++;
           else{
-            STOP=1;//³¹µ×Í£³µ
+            STOP=1;//å½»åº•åœè½¦
           }
         }
-        //ÏÔÊ¾ĞÅÏ¢²ÎÊı
+        //æ˜¾ç¤ºä¿¡æ¯å‚æ•°
        if(key_check(KEY_B) == KEY_DOWN)
        {       
-         LCDShowMode=!LCDShowMode;//ĞŞ¸ÄÏÔÊ¾µÄÄÚÈİ
+         LCDShowMode=!LCDShowMode;//ä¿®æ”¹æ˜¾ç¤ºçš„å†…å®¹
          LCD_clear(RED);
          DELAY_MS(200); 
        }
@@ -201,23 +198,23 @@ void main()
          else if(key_check(KEY_D) == KEY_DOWN)
          {
            limit--;
-           SCCB_WriteByte(OV7725_CNST,limit);          //ÉèÖÃãĞÖµ
+           SCCB_WriteByte(OV7725_CNST,limit);          //è®¾ç½®é˜ˆå€¼
          }
-         LCD_Img_gray_Z(site_1, size_2, (uint8*)p1, imgsize);//ÏÔÊ¾½âÑ¹ºóµÄ³õÊ¼Í¼Ïñ
+         LCD_Img_gray_Z(site_1, size_2, (uint8*)p1, imgsize);//æ˜¾ç¤ºè§£å‹åçš„åˆå§‹å›¾åƒ
          LCD_line_display(site_1);
          LCD_num_C(site2,leadYEnd-leadYStart,FCOLOUR,BCOLOUR);
          CarGo=1;
        }
        else{
-         ParameterSet();//ÆÁÄ»°´¼üµ÷²Î  
+         ParameterSet();//å±å¹•æŒ‰é”®è°ƒå‚  
          
        }
         if(CarGo!=0)
         {  
           if(CarRate<HighSpeed)
-            CarRate+=0.5;
+            CarRate+=1;
           if(tt<600 )tt++;
-            else CarStop=1;//ÔÊĞíÍ£³µ
+            else CarStop=1;//å…è®¸åœè½¦
           
        }
 
@@ -230,18 +227,18 @@ uint8 SpeedControlPeriod=0;
 uint8 DirPeriod=0;
 float SpeedChange=0;
 
-void PIT0_IRQHandler(void)//1ms½øÒ»´ÎÖĞ¶Ï
+void PIT0_IRQHandler(void)//1msè¿›ä¸€æ¬¡ä¸­æ–­
 {       
-  AngleAcceleration_AD (AngleAcceleArry);  //ÍÓÂİÒÇºÍ¼ÓËÙ¶È¼ÆµÄ²É¼¯
+  AngleAcceleration_AD (AngleAcceleArry);  //é™€èºä»ªå’ŒåŠ é€Ÿåº¦è®¡çš„é‡‡é›†
   
-  acc_init[PIT0InteruptEventCount]=AngleAcceleArry[2];//¼ÓËÙ¶È¼Æ//zÖá
-  gyro_init[PIT0InteruptEventCount]=AngleAcceleArry[5];//ÍÓÂİÒÇ 
+  acc_init[PIT0InteruptEventCount]=AngleAcceleArry[2];//åŠ é€Ÿåº¦è®¡//zè½´
+  gyro_init[PIT0InteruptEventCount]=AngleAcceleArry[5];//é™€èºä»ª 
   
-  if(PIT0InteruptEventCount==4)   //Ö±Á¢µÄ¿ØÖÆ
+  if(PIT0InteruptEventCount==4)   //ç›´ç«‹çš„æ§åˆ¶
   {
     if(STOP==1)motor_control(0,0);
     else{
-    Straigth();//Ö±Á¢¿ØÖÆ
+    Straigth();//ç›´ç«‹æ§åˆ¶
     motor_control(Car_Info.Upright_PWM - Car_Info.Speed_PWM - Car_Info.DirPWM,
                   Car_Info.Upright_PWM - Car_Info.Speed_PWM + Car_Info.DirPWM);
    // motor_control(Car_Info.Upright_PWM  - Car_Info.DirPWM,
@@ -249,24 +246,24 @@ void PIT0_IRQHandler(void)//1ms½øÒ»´ÎÖĞ¶Ï
    // motor_control(Car_Info.Upright_PWM,Car_Info.Upright_PWM);
     }
   }  
-  else if(PIT0InteruptEventCount==3)   //ÍÓÂİÒÇ
+  else if(PIT0InteruptEventCount==3)   //é™€èºä»ª
   {
      ReadSensorData();
      Complement_Filter_Ex((float)(Acc_Offset-Angle_Smp), 
-                      (float)(Angle_dot_Smp - Gyro_Offset));//½Ç¶È ½ÇËÙ¶È
-     Car_Info.Angle=Angle;              //½Ç¶È
-     Car_Info.Angle_dot=Angle_dot;     //½ÇËÙ¶È
+                      (float)(Angle_dot_Smp - Gyro_Offset));//è§’åº¦ è§’é€Ÿåº¦
+     Car_Info.Angle=Angle;              //è§’åº¦
+     Car_Info.Angle_dot=Angle_dot;     //è§’é€Ÿåº¦
   }   
      
-  else if(PIT0InteruptEventCount==2)   //ËÙ¶È»·´¦Àí³ÌĞò
+  else if(PIT0InteruptEventCount==2)   //é€Ÿåº¦ç¯å¤„ç†ç¨‹åº
   {
       Rpulse=-ftm_quad_get(FTM1);    ftm_quad_clean(FTM1);
       Lpulse=ftm_quad_get(FTM2);     ftm_quad_clean(FTM2);
       LPulseSum+=Lpulse;             RPulseSum+=Rpulse;
       SpeedControlPeriod++;
-      if(SpeedControlPeriod>=20)//100msÖ´ĞĞÒ»´ÎËÙ¶È¿ØÖÆ
+      if(SpeedControlPeriod>=20)//100msæ‰§è¡Œä¸€æ¬¡é€Ÿåº¦æ§åˆ¶
       {
-        SpeedPID.SetPoint=CarRate;//ÉèÖÃ³µËÙÆÚÍû
+        SpeedPID.SetPoint=CarRate;//è®¾ç½®è½¦é€ŸæœŸæœ›
         SpeedControl();
         SpeedChange=Car_Info.NewSpeed-Car_Info.OldSpeed;
         SpeedControlPeriod=0;
@@ -274,10 +271,10 @@ void PIT0_IRQHandler(void)//1ms½øÒ»´ÎÖĞ¶Ï
     Car_Info.Speed_PWM=(int)(Car_Info.OldSpeed + (SpeedControlPeriod+1) * SpeedChange/20);
   }
   
-  else if(PIT0InteruptEventCount==1)//·½Ïò»·
+  else if(PIT0InteruptEventCount==1)//æ–¹å‘ç¯
   {
-    if(LineType==1)DirPID.Kp=DirKp;//Ö±Ïß
-    else DirPID.Kp=DirKp2;//ÇúÏß
+    if(LineType==1)DirPID.Kp=DirKp;//ç›´çº¿
+    else DirPID.Kp=DirKp2;//æ›²çº¿
 
     DirPID.SetPoint=DirSetPoint;
      
@@ -290,31 +287,31 @@ void PIT0_IRQHandler(void)//1ms½øÒ»´ÎÖĞ¶Ï
   }
   else PIT0InteruptEventCount=0;
   
-  PIT0InteruptEventCount++;        // 0--4Ñ­»·
+  PIT0InteruptEventCount++;        // 0--4å¾ªç¯
   if( PIT0InteruptEventCount==5)
       PIT0InteruptEventCount=0;
        
-  PIT_Flag_Clear(PIT0);//ÇåÖĞ¶Ï±êÖ¾Î»
+  PIT_Flag_Clear(PIT0);//æ¸…ä¸­æ–­æ ‡å¿—ä½
 }
 
 
 void PORTA_IRQHandler()
 {
-    uint8  n;    //Òı½ÅºÅ
+    uint8  n;    //å¼•è„šå·
     uint32 flag;
 
     while(!PORTA_ISFR);
     flag = PORTA_ISFR;
-    PORTA_ISFR  = ~0;                                   //ÇåÖĞ¶Ï±êÖ¾Î»
+    PORTA_ISFR  = ~0;                                   //æ¸…ä¸­æ–­æ ‡å¿—ä½
 
-    n = 29;                                             //³¡ÖĞ¶Ï
-    if(flag & (1 << n))                                 //PTA29´¥·¢ÖĞ¶Ï
+    n = 29;                                             //åœºä¸­æ–­
+    if(flag & (1 << n))                                 //PTA29è§¦å‘ä¸­æ–­
     {
         camera_vsync();
     }
-#if ( CAMERA_USE_HREF == 1 )                            //Ê¹ÓÃĞĞÖĞ¶Ï
+#if ( CAMERA_USE_HREF == 1 )                            //ä½¿ç”¨è¡Œä¸­æ–­
     n = 28;
-    if(flag & (1 << n))                                 //PTA28´¥·¢ÖĞ¶Ï
+    if(flag & (1 << n))                                 //PTA28è§¦å‘ä¸­æ–­
     {
         camera_href();
       
@@ -325,7 +322,7 @@ void PORTA_IRQHandler()
 }
 
 /*!
- *  @brief      DMA0ÖĞ¶Ï·şÎñº¯Êı
+ *  @brief      DMA0ä¸­æ–­æœåŠ¡å‡½æ•°
  *  @since      v5.0
  */
 void DMA0_IRQHandler()
@@ -334,12 +331,12 @@ void DMA0_IRQHandler()
 }
 
 
-//ÆÁÄ»°´¼üÉèÖÃ²ÎÊı
+//å±å¹•æŒ‰é”®è®¾ç½®å‚æ•°
 void ParameterSet()
 {
   if(KeyFree==1)
   {
-    //Ñ¡ÔñÒªµ÷ÕûµÄ²ÎÊı
+    //é€‰æ‹©è¦è°ƒæ•´çš„å‚æ•°
     if(key_check(KEY_R) == KEY_DOWN)
     {
         modle_key++;
@@ -349,10 +346,10 @@ void ParameterSet()
         modle_key--;
     }
     modle_key %=6;
-    //µ÷Õû²ÎÊı
+    //è°ƒæ•´å‚æ•°
     switch(modle_key)
     {
-    case 0://Ö±Á¢kp
+    case 0://ç›´ç«‹kp
       {
         if(key_check(KEY_U) == KEY_DOWN)
           DirKp+=0.1;
@@ -367,7 +364,7 @@ void ParameterSet()
         LCD_num_C (site_z_2, (int)(limit) , FCOLOUR , BCOLOUR);
         break;
       }
-    case 1://Ö±Á¢kd
+    case 1://ç›´ç«‹kd
       {
         if(key_check(KEY_U) == KEY_DOWN)
            DirKp2+=0.1;
@@ -381,7 +378,7 @@ void ParameterSet()
         LCD_num_C (site_z_2, (int)(limit) , FCOLOUR , BCOLOUR);
         break;
       }
-    case 2://¼ÓËÙ¶Èoffset
+    case 2://åŠ é€Ÿåº¦offset
       {
         if(key_check(KEY_U) == KEY_DOWN)
           DirSetPoint++;
@@ -395,7 +392,7 @@ void ParameterSet()
         LCD_num_C (site_z_2, (int)(limit) , FCOLOUR , BCOLOUR);
         break;
       }
-    case 3://·½Ïòkp
+    case 3://æ–¹å‘kp
       {
         if(key_check(KEY_U) == KEY_DOWN)
           HighSpeed++;
@@ -409,7 +406,7 @@ void ParameterSet()
         LCD_num_C (site_z_2, (int)(limit) , FCOLOUR , BCOLOUR);
         break;
       }
-    case 4://·½Ïòkd
+    case 4://æ–¹å‘kd
       {
         if(key_check(KEY_U) == KEY_DOWN)
           Acc_Offset++;
@@ -423,7 +420,7 @@ void ParameterSet()
         LCD_num_C (site_z_2, (int)(limit) , FCOLOUR , BCOLOUR);
         break;
       }
-    case 5://·½Ïòsetpoint
+    case 5://æ–¹å‘setpoint
       {
         if(key_check(KEY_U) == KEY_DOWN)
           limit++;
@@ -439,10 +436,10 @@ void ParameterSet()
       }
     }
   }
-  //±ÜÃâÁ¬°´
+  //é¿å…è¿æŒ‰
     if((key_check(KEY_U) == KEY_UP) &&(key_check(KEY_D) == KEY_UP) \
           && (key_check(KEY_R) == KEY_UP) && (key_check(KEY_L) == KEY_UP))
-      KeyFree=1;//°´¼üÒÑËÉ¿ª
+      KeyFree=1;//æŒ‰é”®å·²æ¾å¼€
   else KeyFree=0;
  
 }

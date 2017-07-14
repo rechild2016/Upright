@@ -13,44 +13,44 @@ uint8   biansu=0;
 uint8   biancan=0;
 uint8  zhuantou=0;
 
-//²É¼¯ÓÃµÄ
+//é‡‡é›†ç”¨çš„
 uint8 Buffer[120];
-//Ë«Êı×é²É¼¯ÓÃµÄ
+//åŒæ•°ç»„é‡‡é›†ç”¨çš„
 uint8 processReady=0;
 uint8 wantProcess=0;
-//²É¼¯ÓÃµÄ
+//é‡‡é›†ç”¨çš„
 uint8 ImageBuffer1[SROW][SCOLUMN];
 uint8 ImageBuffer2[SROW][SCOLUMN];
-//Á¬Í¨Í¼
-unsigned char ConGraph[60][20] = { 0 };//Á¬Í¨Í¼
+//è¿é€šå›¾
+unsigned char ConGraph[60][20] = { 0 };//è¿é€šå›¾
 uint8 IsConnect[60]={0};
 uint8 ConNum[60]={0};
-//ÇóÁ¬Í¨Í¼
+//æ±‚è¿é€šå›¾
 extern uint8 img[60][20];
-#define ColConnect(a,b) (a|b)!=255				//ÁĞÁ¬Í¨ 1Á¬Í¨
-#define RowConnect(a,b) (0x01&((a) | ((b) >>7)))==0	//ĞĞÁ¬Í¨ 0ÎªÁ¬Í¨
+#define ColConnect(a,b) (a|b)!=255				//åˆ—è¿é€š 1è¿é€š
+#define RowConnect(a,b) (0x01&((a) | ((b) >>7)))==0	//è¡Œè¿é€š 0ä¸ºè¿é€š
 uint8 *pSample=ImageBuffer1[0];
 uint8 *pProcess=ImageBuffer2[0];
 uint8 *pTemp=ImageBuffer1[0];
-//»·ĞÎ
+//ç¯å½¢
 int Linemid_1[PROW]={0};
 int xyz=-1;
 int huan_sign=0;
-//ÇúÏß
-int leftYStart, leftYEnd, rightYStart, rightYEnd, leadYStart, leadYEnd;//×óÏß,ÓÒÏßºÍÒıµ¼ÏßµÄY·½ÏòÆğÊ¼¼°ÖÕÖ¹µã
-int LineType;  //ÇúÏßÀàĞÍ
+//æ›²çº¿
+int leftYStart, leftYEnd, rightYStart, rightYEnd, leadYStart, leadYEnd;//å·¦çº¿,å³çº¿å’Œå¼•å¯¼çº¿çš„Yæ–¹å‘èµ·å§‹åŠç»ˆæ­¢ç‚¹
+int LineType;  //æ›²çº¿ç±»å‹
 int leftLine[PROW];
 int rightLine[PROW];
-//ÕÏ°­Îï×îµÍĞĞ
+//éšœç¢ç‰©æœ€ä½è¡Œ
 int block_hang=0;
 int leadLine[PROW];
-int ShowArray[PROW];//ÉÏÎ»»úÏÔÊ¾Êı×é
-int Ping[5];  //Æ½¾ùÂË²¨ ºóÆÚ¿ÉÉ¾
-int WIDTH=36;//¼ÇÂ¼ÈüµÀ¿í¶È
+int ShowArray[PROW];//ä¸Šä½æœºæ˜¾ç¤ºæ•°ç»„
+int Ping[5];  //å¹³å‡æ»¤æ³¢ åæœŸå¯åˆ 
+int WIDTH=36;//è®°å½•èµ›é“å®½åº¦
 int leadlength;
 int midpoint_before = HEART,midpoint_before_E = HEART  ;
 int Ruhuan_sign=0;
-int offset_1;//´Ë´¦µÄoffset_1  ²»¿É¸ü¸Ä±äÁ¿ÃûÎªoffset£¬Ò°»ğ¿âµÄ¹Ø¼ü×Ö°¡£¬²»È»ÔõÃ´ËÀµÄ¶¼²»ÖªµÀ
+int offset_1;//æ­¤å¤„çš„offset_1  ä¸å¯æ›´æ”¹å˜é‡åä¸ºoffsetï¼Œé‡ç«åº“çš„å…³é”®å­—å•Šï¼Œä¸ç„¶æ€ä¹ˆæ­»çš„éƒ½ä¸çŸ¥é“
 int offset_2;
 int dOffset;
 int oldOffset;
@@ -61,13 +61,13 @@ float CircleRate=0;
 
 uint8 STOP=0;
 
-uint8 processBuf1[PROW][PCOLUMN];//½âÑ¹ºó´¦ÀíÇ°µÄ
-uint8 processBuf2[PROW][PCOLUMN];//´¦ÀíºóµÄ
+uint8 processBuf1[PROW][PCOLUMN];//è§£å‹åå¤„ç†å‰çš„
+uint8 processBuf2[PROW][PCOLUMN];//å¤„ç†åçš„
 uint8 *p1=processBuf1[0];
 uint8 *p2=processBuf2[0];
 
 /***********************************/
-//Êı×éÖØÖÃÊıÖµ
+//æ•°ç»„é‡ç½®æ•°å€¼
 void ArraySetValue(uint8 *src,uint8 value)
 {
     uint8 i=0,j=0;
@@ -79,7 +79,7 @@ void ArraySetValue(uint8 *src,uint8 value)
         }
     }
 } 
-//¼ÓÈ¨µİÍÆÆ½¾ùÂË²¨
+//åŠ æƒé€’æ¨å¹³å‡æ»¤æ³¢
 int AAGAFilter(int *src)
 { 
  
@@ -87,7 +87,7 @@ int AAGAFilter(int *src)
    int sum=0,CoeSum=465;
    int Coefficient[30]; 
 
-   for(i=1;i<31;i++) //  ÇóºÍ
+   for(i=1;i<31;i++) //  æ±‚å’Œ
    {
       Coefficient[i-1]=i;
    }
@@ -105,14 +105,14 @@ int AAGAFilter(int *src)
 }
 
 /**********************************
-//ËÑË÷±ß½ç
+//æœç´¢è¾¹ç•Œ
 int leftEdge1[PROW]={0};
 int rightEdge1[PROW]={0};
 
 void Search_the_boundary(void)
 {
 	int i,j;
-	for(i=59;i>=0;i--)//×ó±ß½ç
+	for(i=59;i>=0;i--)//å·¦è¾¹ç•Œ
 	{
 		for(j=0;j<160;j++)
 		{
@@ -123,7 +123,7 @@ void Search_the_boundary(void)
 			}
 		}
 	}
-	for(i=59;i>=0;i--)//ÓÒ±ß½ç
+	for(i=59;i>=0;i--)//å³è¾¹ç•Œ
 	{
 		for(j=159;j>=0;j--)
 		{
@@ -138,15 +138,15 @@ void Search_the_boundary(void)
 }*/
 
 /**************************************************************************************/
-/*****************************************Ñ°ÕÒË«Ïß***********************************/
-//¼ÇÂ¼Ìø±äÑØ
+/*****************************************å¯»æ‰¾åŒçº¿***********************************/
+//è®°å½•è·³å˜æ²¿
 void RecordBWChange(uint8 *src,uint8 *pSrc)//P1 P2
 {
         int num1, num2;
 	int two_white_sign=0,two_black_sign=0,usefull_hang=0;
         block_hang=0;
-   ArraySetValue(pSrc, 255); //ÖØ×éÊı×é£¬P2È«¸ø0 
-    for (int i = 0; i < PROW; i++)//Ã¿Ò»ĞĞ
+   ArraySetValue(pSrc, 255); //é‡ç»„æ•°ç»„ï¼ŒP2å…¨ç»™0 
+    for (int i = 0; i < PROW; i++)//æ¯ä¸€è¡Œ
     {   two_white_sign=0;
         two_black_sign=0;
         
@@ -154,7 +154,7 @@ void RecordBWChange(uint8 *src,uint8 *pSrc)//P1 P2
         {
             num1 = *(src+i*PCOLUMN+j);
             num2 = *(src+i*PCOLUMN+j+1);
-            if (num1 == 0 && num2 == 255)//0ÊÇºÚ£¬255°×
+            if (num1 == 0 && num2 == 255)//0æ˜¯é»‘ï¼Œ255ç™½
             {
                 *(pSrc+i*PCOLUMN+j)= 1;
             }
@@ -168,9 +168,9 @@ void RecordBWChange(uint8 *src,uint8 *pSrc)//P1 P2
 			       two_white_sign++; 
 				if(two_black_sign>6&&two_black_sign<15)
 					{
-					//°× ºÚ °×
+					//ç™½ é»‘ ç™½
                                           
-					two_black_sign=0;//  ÖÃÎ»Ê¹µÃÃ¿Ò»ĞĞÖ»½øÀ´Ò»´Î
+					two_black_sign=0;//  ç½®ä½ä½¿å¾—æ¯ä¸€è¡Œåªè¿›æ¥ä¸€æ¬¡
                                         if(usefull_hang==0)
                                           block_hang=i;
                                         usefull_hang++;					                
@@ -191,7 +191,7 @@ void RecordBWChange(uint8 *src,uint8 *pSrc)//P1 P2
              
 	
 }
-///**************ÖĞÎ»ÊıÂË²¨*********/
+///**************ä¸­ä½æ•°æ»¤æ³¢*********/
 #define N 5
 int zwzfilter(int leadlength)
 {
@@ -228,17 +228,17 @@ int zwzfilter(int leadlength)
 
 
 /*****/
-//ÓÉÌø±äÑØ¼ÇÂ¼Êı×é³õ²½Ñ°ÕÒ×óÓÒÏß
+//ç”±è·³å˜æ²¿è®°å½•æ•°ç»„åˆæ­¥å¯»æ‰¾å·¦å³çº¿
 int leftHalf[PCOLUMN/2];
 int rightHalf[PCOLUMN/2];
 int leftHalf0[PCOLUMN/2];
 int rightHalf0[PCOLUMN/2];
 int SearchBaseLines(uint8 *pSrc)//P2
 {
-    //±äÁ¿¶¨Òå
+    //å˜é‡å®šä¹‰
     int num, t1, leftCnt, rightCnt;
     int i,j,m,n,lie;
-    //Çå¿ÕÖ®Ç°µÄÑ°ÏßÊı¾İ
+    //æ¸…ç©ºä¹‹å‰çš„å¯»çº¿æ•°æ®
     leftYStart = -1; rightYStart = -1; leftYEnd = -1; rightYEnd = -1; leadYStart = -1; leadYEnd = -1;
     zhuantou=0;
     for (i = 0; i < PROW; i++)
@@ -250,19 +250,19 @@ int SearchBaseLines(uint8 *pSrc)//P2
 	/*************
     int a=0;
     WIDTH[0]=0;
-    for(i=0;i<PROW;i++)//ËÑË÷ËùÓĞĞĞ£¬¶ÁÈ¡ÈüµÀ¿í¶È£»
+    for(i=0;i<PROW;i++)//æœç´¢æ‰€æœ‰è¡Œï¼Œè¯»å–èµ›é“å®½åº¦ï¼›
     {
-        if(WIDTH[59]!=0)break;//ÒÑ¶ÁÈ¡ÈüµÀ¿í¶ÈÔòÍË³ö       
-        leftCnt = 0;//ÕÒµ½µÄµãÊı
+        if(WIDTH[59]!=0)break;//å·²è¯»å–èµ›é“å®½åº¦åˆ™é€€å‡º       
+        leftCnt = 0;//æ‰¾åˆ°çš„ç‚¹æ•°
         for (j = HEART; j > 0; j--)
         {
             num = *(pSrc+(PROW - 1 - i)*PCOLUMN+j);
             if (num == 1)
             {
-                leftHalf0[leftCnt++] = j;//µÚ¼¸¸öµãµÄÁĞÊı
+                leftHalf0[leftCnt++] = j;//ç¬¬å‡ ä¸ªç‚¹çš„åˆ—æ•°
             }
         }
-        //ÏòÓÒËÑË÷
+        //å‘å³æœç´¢
         rightCnt = 0;
         for (j = HEART; j < 159; j++)
         {
@@ -279,22 +279,22 @@ int SearchBaseLines(uint8 *pSrc)//P2
     a=a/60;
     num=0;*/
     //////////////************/
-    //ÏÈËÑË÷×îÏÂ·½Èô¸É(40)ĞĞ£¬Ö¸ÏÖÊµÖĞµÄĞĞÊı
+    //å…ˆæœç´¢æœ€ä¸‹æ–¹è‹¥å¹²(40)è¡Œï¼ŒæŒ‡ç°å®ä¸­çš„è¡Œæ•°
     for (i = 0; i < MAX_SEARCH_HEIGHT; i++)
     {
-        //Ïò×óËÑË÷
-        leftCnt = 0;//ÕÒµ½µÄµãÊı
+        //å‘å·¦æœç´¢
+        leftCnt = 0;//æ‰¾åˆ°çš„ç‚¹æ•°
         for (j = HEART; j > leftEdge[PROW - 1 - i]; j--)
         {
             num = *(pSrc+(PROW - 1 - i)*PCOLUMN+j);
             if (num == 1)
             {
-                leftHalf[leftCnt++] = j;//µÚ¼¸¸öµãµÄÁĞÊı
+                leftHalf[leftCnt++] = j;//ç¬¬å‡ ä¸ªç‚¹çš„åˆ—æ•°
                 //break;
             }
         }
 
-        //ÏòÓÒËÑË÷
+        //å‘å³æœç´¢
         rightCnt = 0;
         for (j = HEART; j < rightEdge[PROW - 1 - i]; j++)
         {
@@ -306,30 +306,30 @@ int SearchBaseLines(uint8 *pSrc)//P2
             }
         }
 		
-        //Í³¼ÆËÑË÷½á¹û
-        if (leftCnt == 0 && rightCnt!=0)//ÓÒ±ßÓĞÏß×ó±ßÃ»Ïß
+        //ç»Ÿè®¡æœç´¢ç»“æœ
+        if (leftCnt == 0 && rightCnt!=0)//å³è¾¹æœ‰çº¿å·¦è¾¹æ²¡çº¿
         {
             rightYStart = i;
             rightYEnd = i;
-            rightLine[i] = rightHalf[0];//µÚiĞĞ×îÀï±ßµÄÌø±äµÄÁĞÊı
+            rightLine[i] = rightHalf[0];//ç¬¬iè¡Œæœ€é‡Œè¾¹çš„è·³å˜çš„åˆ—æ•°
         }
-        else if (rightCnt == 0 && leftCnt != 0)//×ó±ßÓĞÏßÓÒ±ßÃ»Ïß
+        else if (rightCnt == 0 && leftCnt != 0)//å·¦è¾¹æœ‰çº¿å³è¾¹æ²¡çº¿
         {
             leftYStart = i;
             leftYEnd = i;
-            leftLine[i] = leftHalf[0];//µÚiĞĞ×îÀï±ßµÄÌø±äµÄÁĞÊı
+            leftLine[i] = leftHalf[0];//ç¬¬iè¡Œæœ€é‡Œè¾¹çš„è·³å˜çš„åˆ—æ•°
         }
-        else if (leftCnt != 0 && rightCnt != 0)//×óÓÒ¶¼ÓĞÏß
+        else if (leftCnt != 0 && rightCnt != 0)//å·¦å³éƒ½æœ‰çº¿
         {
             for (m = 0; m < leftCnt; m++)
             {
                 for (n = 0; n < rightCnt; n++)
                 {
-                    t1 = rightHalf[n] - leftHalf[m];//×óÓÒµã¼ä¾à
-                    //1cm  Îª1.3¸öµã
-                    //¸Ğ¾õ´Ë·½·¨µÃ½øĞĞĞ£ÕıºóÊ¹ÓÃ 
+                    t1 = rightHalf[n] - leftHalf[m];//å·¦å³ç‚¹é—´è·
+                    //1cm  ä¸º1.3ä¸ªç‚¹
+                    //æ„Ÿè§‰æ­¤æ–¹æ³•å¾—è¿›è¡Œæ ¡æ­£åä½¿ç”¨ 
                     
-                    if (t1 < WIDTH + 8 && t1 > WIDTH - 8)//¼ä¾àÔÚÈüµÀ¼ä¾à·¶Î§ÄÚ  
+                    if (t1 < WIDTH + 8 && t1 > WIDTH - 8)//é—´è·åœ¨èµ›é“é—´è·èŒƒå›´å†…  
                     {
                         leftYStart = i;
                         leftYEnd = i;
@@ -340,66 +340,66 @@ int SearchBaseLines(uint8 *pSrc)//P2
                         break;
                     }
                 }
-                if (leftYStart != -1 && rightYStart != -1)//ÕÒµ½ÈüµÀ£¬Ìø³öÑ­»·
+                if (leftYStart != -1 && rightYStart != -1)//æ‰¾åˆ°èµ›é“ï¼Œè·³å‡ºå¾ªç¯
                 {
                     break;
                 }
             }
 		  
         }
-        //ËÑµ½Àë¿ª
-        if (leftYStart != -1 || rightYStart != -1)//ÆäÖĞÒ»±ßËÑË÷µ½
+        //æœåˆ°ç¦»å¼€
+        if (leftYStart != -1 || rightYStart != -1)//å…¶ä¸­ä¸€è¾¹æœç´¢åˆ°
         {
-            if (leftYStart != -1)//Èç¹û×ó±ßËÑµ½
+            if (leftYStart != -1)//å¦‚æœå·¦è¾¹æœåˆ°
             {
                 if (rightYStart != -1)
                 {
-                    //Á½±ßÍ¬Ê±ËÑµ½
+                    //ä¸¤è¾¹åŒæ—¶æœåˆ°
                     break;
                 }
                 else
                 {
-                    //Ö»ËÑµ½×ó±ß
-                    EdgeTrace(pSrc, leftLine);//¸ú×Ù×óÏß
+                    //åªæœåˆ°å·¦è¾¹
+                    EdgeTrace(pSrc, leftLine);//è·Ÿè¸ªå·¦çº¿
                     if (leftYEnd != leftYStart)
                     {
-                        CompleteLine(leftLine);//½øĞĞ²¹Ïß
+                        CompleteLine(leftLine);//è¿›è¡Œè¡¥çº¿
                         break;
                     }
                 }
             }
             else
             {
-                //Ö»ËÑµ½ÓÒ±ß
-                EdgeTrace(pSrc, rightLine);//¸ú×ÙÓÒÏß
+                //åªæœåˆ°å³è¾¹
+                EdgeTrace(pSrc, rightLine);//è·Ÿè¸ªå³çº¿
                 if (rightYEnd != rightYStart)
                 {
-                    CompleteLine(rightLine);//½øĞĞ²¹Ïß
+                    CompleteLine(rightLine);//è¿›è¡Œè¡¥çº¿
                     break;
                 }
             }
         }
-    }//ËùÓĞĞĞËÑË÷½áÊø
+    }//æ‰€æœ‰è¡Œæœç´¢ç»“æŸ
 
-    //Î´ËÑµ½¶ªÆú
+    //æœªæœåˆ°ä¸¢å¼ƒ
     if (leftYStart == -1 && rightYStart == -1)
     {
         return -1;
     }
 	
-    //ËÑµ½Ë«±ßÔòÅĞ¶Ï¾àÀëÊÇ·ñºÏ¸ñ
+    //æœåˆ°åŒè¾¹åˆ™åˆ¤æ–­è·ç¦»æ˜¯å¦åˆæ ¼
     if (leftYStart != -1 && rightYStart != -1)
     {
-        EdgeTrace(pSrc, leftLine);//¸ú×Ù×óÏß
-        CompleteLine(leftLine);//²¹×óÏß
-        EdgeTrace(pSrc, rightLine);//¸ú×ÙÓÒÏß
-        CompleteLine(rightLine);//²¹ÓÒÏß
+        EdgeTrace(pSrc, leftLine);//è·Ÿè¸ªå·¦çº¿
+        CompleteLine(leftLine);//è¡¥å·¦çº¿
+        EdgeTrace(pSrc, rightLine);//è·Ÿè¸ªå³çº¿
+        CompleteLine(rightLine);//è¡¥å³çº¿
     }
 	
-    //Ö»ËÑµ½×ó±ßÔòÏÈ×ó±ß¸ú×Ù±ßÔµ
+    //åªæœåˆ°å·¦è¾¹åˆ™å…ˆå·¦è¾¹è·Ÿè¸ªè¾¹ç¼˜
     else if (leftYStart != -1 && rightYStart == -1)
     {
-        //¶Ô×óÏßµÄÃ¿Ò»ĞĞÏòÓÒÑ°Ïß,¼ÆËãĞ£ÕıºóµÄ¾àÀë,ÒÔ´Ë×÷ÎªºÚµãÊÇ·ñºÏ¸ñµÄÒÀ¾İ
+        //å¯¹å·¦çº¿çš„æ¯ä¸€è¡Œå‘å³å¯»çº¿,è®¡ç®—æ ¡æ­£åçš„è·ç¦»,ä»¥æ­¤ä½œä¸ºé»‘ç‚¹æ˜¯å¦åˆæ ¼çš„ä¾æ®
         for (i = leftYStart; i <= leftYEnd; i++)
         {
             for (j = leftLine[i] + 1; j <rightEdge[i]; j++)
@@ -418,16 +418,16 @@ int SearchBaseLines(uint8 *pSrc)//P2
             }
             if (rightYStart != -1)
             {
-                EdgeTrace(pSrc, rightLine);//¸ú×ÙÓÒÏß
-                CompleteLine(rightLine);//²¹ÓÒÏß
+                EdgeTrace(pSrc, rightLine);//è·Ÿè¸ªå³çº¿
+                CompleteLine(rightLine);//è¡¥å³çº¿
                 break;
             }
         }
     }
-    //Ö»ËÑµ½ÓÒ±ßÔòÏÈÓÒ±ß¸ú×Ù±ßÔµ
+    //åªæœåˆ°å³è¾¹åˆ™å…ˆå³è¾¹è·Ÿè¸ªè¾¹ç¼˜
     else if (leftYStart == -1 && rightYStart != -1)
     {
-        //¶Ô×óÏßµÄÃ¿Ò»ĞĞÏòÓÒÑ°Ïß,¼ÆËãĞ£ÕıºóµÄ¾àÀë,ÒÔ´Ë×÷ÎªºÚµãÊÇ·ñºÏ¸ñµÄÒÀ¾İ
+        //å¯¹å·¦çº¿çš„æ¯ä¸€è¡Œå‘å³å¯»çº¿,è®¡ç®—æ ¡æ­£åçš„è·ç¦»,ä»¥æ­¤ä½œä¸ºé»‘ç‚¹æ˜¯å¦åˆæ ¼çš„ä¾æ®
         for (i = rightYStart; i <= rightYEnd; i++)
         {
             for (j = rightLine[i] - 1; j >leftEdge[i] ; j--)
@@ -446,8 +446,8 @@ int SearchBaseLines(uint8 *pSrc)//P2
             }
             if (leftYStart != -1)
             {
-                EdgeTrace(pSrc, leftLine);//¸ú×Ù×óÏß
-                CompleteLine(leftLine);//²¹×óÏß
+                EdgeTrace(pSrc, leftLine);//è·Ÿè¸ªå·¦çº¿
+                CompleteLine(leftLine);//è¡¥å·¦çº¿
                 break;
             }
         }
@@ -457,27 +457,27 @@ int SearchBaseLines(uint8 *pSrc)//P2
 
 
 /*********************************************/
-//¸ú×Ù±ßÔµÑ°Ïß
-void EdgeTrace(uint8 *pSrc, int line[])//P2  ×óÏßÊı×é
+//è·Ÿè¸ªè¾¹ç¼˜å¯»çº¿
+void EdgeTrace(uint8 *pSrc, int line[])//P2  å·¦çº¿æ•°ç»„
 {
     int xMid, xStart, xEnd, num, lost,i,j;
-    //×óÏß
+    //å·¦çº¿
     if (line == leftLine)
     {
-        //¿ªÊ¼ÓÉÓÒÏò×ó±ßÔµ×ó¸ú×Ù
+        //å¼€å§‹ç”±å³å‘å·¦è¾¹ç¼˜å·¦è·Ÿè¸ª
         lost = 0;
         xMid = line[leftYStart];
         for (i = leftYStart + 1; i < PROW; i++)
         {
-            //ÈôÊÇÉÏÒ»ĞĞÕÒµ½²ÅÒÔÉÏÒ»ĞĞÎª»ù×¼
+            //è‹¥æ˜¯ä¸Šä¸€è¡Œæ‰¾åˆ°æ‰ä»¥ä¸Šä¸€è¡Œä¸ºåŸºå‡†
             if (line[i - 1] != 0)
             {
                 xMid = line[i - 1];
             }
 			
-            //¿ªÊ¼Óë½áÊø
+            //å¼€å§‹ä¸ç»“æŸ
             xStart = xMid + MAX_XDIS;
-            if (xStart > rightEdge[PROW - 1 - i]) { xStart = rightEdge[i]; }//²»³¬¹ıĞ£ÕıºóµÄ±ß½ç
+            if (xStart > rightEdge[PROW - 1 - i]) { xStart = rightEdge[i]; }//ä¸è¶…è¿‡æ ¡æ­£åçš„è¾¹ç•Œ
 			
             xEnd = xMid - MAX_XDIS;
             if (xEnd < leftEdge[PROW - 1 - i]) { xEnd = leftEdge[i]; }
@@ -485,7 +485,7 @@ void EdgeTrace(uint8 *pSrc, int line[])//P2  ×óÏßÊı×é
             for (j = xStart; j >= xEnd; j--)
             {
                 num = *(pSrc+(PROW - 1 - i)*PCOLUMN+j);
-                //ÕÒµ½Ôò¼ÇÂ¼²¢ÇÒÇå¿Õ¶ªµã¼ÆÊı
+                //æ‰¾åˆ°åˆ™è®°å½•å¹¶ä¸”æ¸…ç©ºä¸¢ç‚¹è®¡æ•°
                 if (num == 1)
                 {
                     leftYEnd = i;
@@ -494,34 +494,34 @@ void EdgeTrace(uint8 *pSrc, int line[])//P2  ×óÏßÊı×é
                     break;
                 }
             }
-            //Î´ÕÒµ½Ôò¶ªµã¼ÆÊıÖµ¼ÓÒ»
+            //æœªæ‰¾åˆ°åˆ™ä¸¢ç‚¹è®¡æ•°å€¼åŠ ä¸€
             if (leftYEnd != i)
             {
                 lost++;
             }
-            //¶ªµã´ÎÊı¹ı¶à¾ÍÍË³ö
+            //ä¸¢ç‚¹æ¬¡æ•°è¿‡å¤šå°±é€€å‡º
             if (lost > MAX_LOST)
             {
                 return;
             }
-        }//Ñ­»·½áÊø
+        }//å¾ªç¯ç»“æŸ
     }
 
 	
-    //ÓÒÏß
+    //å³çº¿
     else if (line == rightLine)
     {
-        //¿ªÊ¼ÓÉÓÒÏò×ó±ßÔµ×ó¸ú×Ù
+        //å¼€å§‹ç”±å³å‘å·¦è¾¹ç¼˜å·¦è·Ÿè¸ª
         lost = 0;
         xMid = line[rightYStart];
         for (i = rightYStart + 1; i < PROW; i++)
         {
-            //ÈôÊÇÉÏÒ»ĞĞÕÒµ½²ÅÒÔÉÏÒ»ĞĞÎª»ù×¼
+            //è‹¥æ˜¯ä¸Šä¸€è¡Œæ‰¾åˆ°æ‰ä»¥ä¸Šä¸€è¡Œä¸ºåŸºå‡†
             if (line[i - 1] != 0)
             {
                 xMid = line[i - 1];
             }
-            //¿ªÊ¼Óë½áÊø
+            //å¼€å§‹ä¸ç»“æŸ
             xStart = xMid - MAX_XDIS;
             if (xStart < leftEdge[PROW - 1 - i]) { xStart = leftEdge[i]; }
             xEnd = xMid + MAX_XDIS;
@@ -529,7 +529,7 @@ void EdgeTrace(uint8 *pSrc, int line[])//P2  ×óÏßÊı×é
             for (j = xStart; j <= xEnd; j++)
             {
                 num = *(pSrc+(PROW - 1 - i)*PCOLUMN+j);
-                //ÕÒµ½Ôò¼ÇÂ¼²¢ÇÒÇå¿Õ¶ªµã¼ÆÊı
+                //æ‰¾åˆ°åˆ™è®°å½•å¹¶ä¸”æ¸…ç©ºä¸¢ç‚¹è®¡æ•°
                 if (num == 1)
                 {
                     rightYEnd = i;
@@ -538,12 +538,12 @@ void EdgeTrace(uint8 *pSrc, int line[])//P2  ×óÏßÊı×é
                     break;
                 }
             }
-            //Î´ÕÒµ½Ôò¶ªµã¼ÆÊıÖµ¼ÓÒ»
+            //æœªæ‰¾åˆ°åˆ™ä¸¢ç‚¹è®¡æ•°å€¼åŠ ä¸€
             if (rightYEnd != i)
             {
                 lost++;
             }
-            //¶ªµã´ÎÊı¹ı¶à¾ÍÍË³ö
+            //ä¸¢ç‚¹æ¬¡æ•°è¿‡å¤šå°±é€€å‡º
             if (lost > MAX_LOST)
             {
                 return;
@@ -552,7 +552,7 @@ void EdgeTrace(uint8 *pSrc, int line[])//P2  ×óÏßÊı×é
     }
 }
 
-//²¹Ïß
+//è¡¥çº¿
 void CompleteLine(int line[])
 {
     int i, j, start = 0, end = PCOLUMN - 1, num, y1 = 0, y2 = 0, t1, t2;
@@ -560,29 +560,29 @@ void CompleteLine(int line[])
     if (line == leftLine) { start = leftYStart; end = leftYEnd; }
     else if (line == rightLine) { start = rightYStart; end = rightYEnd; }
     else { start = leadYStart; end = leadYEnd; }
-    //¶Ô²»ÊÇ0µÄÉÏÏÂÁ½µã°´Ğ±ÂÊ²¹Ïß
+    //å¯¹ä¸æ˜¯0çš„ä¸Šä¸‹ä¸¤ç‚¹æŒ‰æ–œç‡è¡¥çº¿
     for (i = start; i <= end; i++)
     {
         num = line[i];
-        if (num == 0)//³öÏÖ¶ªÊ§µã
+        if (num == 0)//å‡ºç°ä¸¢å¤±ç‚¹
         {
             if (y1 == 0)
             {
-                y1 = i - 1;//y1Îª¶ªÊ§Ç°Ò»µã×İ×ø±ê
+                y1 = i - 1;//y1ä¸ºä¸¢å¤±å‰ä¸€ç‚¹çºµåæ ‡
             }
         }
         if (num != 0 && y1 != 0)
         {
-            y2 = i;//¶ªÊ§ºóµÄµÚÒ»µã×İ×ø±ê
-            t1 = line[y1];//ºá×ø±ê
+            y2 = i;//ä¸¢å¤±åçš„ç¬¬ä¸€ç‚¹çºµåæ ‡
+            t1 = line[y1];//æ¨ªåæ ‡
             t2 = line[y2];
             slope = ((float)t2 - t1) / ((float)y2 - y1);
             for (j = y1 + 1; j < y2; j++)
             {
                 
-                line[j] = (int)(t1 + slope * (j - y1) + 0.5);//0.5ÎªËÄÉáÎåÈë
+                line[j] = (int)(t1 + slope * (j - y1) + 0.5);//0.5ä¸ºå››èˆäº”å…¥
                 if(processBuf1[line[j]][j]==0) /////////                    
-                  line[j] =0;                 /////////2017.7.9¼Ó£¬ÅĞ¶ÏÊÇ²»ÊÇºÚÏß£¬ºÚÏß²»²¼Ïß
+                  line[j] =0;                 /////////2017.7.9åŠ ï¼Œåˆ¤æ–­æ˜¯ä¸æ˜¯é»‘çº¿ï¼Œé»‘çº¿ä¸å¸ƒçº¿
             }
             y1 = 0;
             y2 = 0;
@@ -593,14 +593,14 @@ void CompleteLine(int line[])
 
 /*************************************************************************************/
 
-/****************************************Òıµ¼ÏßÌáÈ¡***********************************/
-//¼ÆËãÒıµ¼Ïß
+/****************************************å¼•å¯¼çº¿æå–***********************************/
+//è®¡ç®—å¼•å¯¼çº¿
 void CalculateLeadLine()
 {
     int y1, y2, y3, y4, yl, yr,leftLine_before=60,rightLine_before=100;
     float divide; 
     int sign=0;
-    //°É×óÓÒÏßÎªÁãµÄµØ·½²¹Ïß
+    //å§å·¦å³çº¿ä¸ºé›¶çš„åœ°æ–¹è¡¥çº¿
      for (int i = leftYStart; i <= leftYEnd; i++)
         {
             if(leftLine[i]==0)
@@ -620,7 +620,7 @@ void CalculateLeadLine()
   
     
         }  
-        //Ö»ÓĞ×óÏß(ÍêÈ«Ã»ÓÒÏß)      
+        //åªæœ‰å·¦çº¿(å®Œå…¨æ²¡å³çº¿)      
             
     if (leftYStart != -1 && rightYStart == -1)
     {   
@@ -631,7 +631,7 @@ void CalculateLeadLine()
         for (int i = leadYStart; i <= leadYEnd; i++)
         {
             
-          //¼ì²â×óÏßÓÒ±ßÊÇ²»ÊÇºÚÏß£¬ÊÇºÚÏß¾Í1  °×Ïß -1
+          //æ£€æµ‹å·¦çº¿å³è¾¹æ˜¯ä¸æ˜¯é»‘çº¿ï¼Œæ˜¯é»‘çº¿å°±1  ç™½çº¿ -1
           for(int j=2;j<7;j++)
           {
            if(processBuf1[PROW-1-i][leftLine[i]-j]==0)
@@ -648,7 +648,7 @@ void CalculateLeadLine()
         
         
     }
-    //Ö»ÓĞÓÒÏß(ÍêÈ«Ã»×óÏß)
+    //åªæœ‰å³çº¿(å®Œå…¨æ²¡å·¦çº¿)
     else if (leftYStart == -1 && rightYStart != -1)
     {
         leadYStart = rightYStart;
@@ -672,11 +672,11 @@ void CalculateLeadLine()
           ///////////////////////
         }
     }
-    //Ë«Ïß
-    else if (leftYStart != -1 && rightYStart != -1)//×óÓÒ¶¼ÓĞÏß
+    //åŒçº¿
+    else if (leftYStart != -1 && rightYStart != -1)//å·¦å³éƒ½æœ‰çº¿
     {
        
-        //×óÊ¢ÓÒË¥
+        //å·¦ç››å³è¡°
         if (leftYEnd - rightYEnd > 18) 
         {
             //FM ( 1) ;    
@@ -700,7 +700,7 @@ void CalculateLeadLine()
           sign=0; 
             }
         }
-        //ÓÒÊ¢×óË¥
+        //å³ç››å·¦è¡°
         else if (rightYEnd - leftYEnd > 18)
         {
             //FM ( 1) ;    
@@ -724,14 +724,14 @@ void CalculateLeadLine()
           sign=0; 
             }
         }
-        //ÒõÑôĞ­µ÷
+        //é˜´é˜³åè°ƒ
         else
         {
            
-            y1 = leftYStart<rightYStart?leftYStart:rightYStart;//SĞ¡
-            y2 = leftYStart<rightYStart?rightYStart:leftYStart;//S´ó
-            y3 = leftYEnd<rightYEnd?leftYEnd:rightYEnd;//EĞ¡
-            y4 = leftYEnd<rightYEnd?rightYEnd:leftYEnd;//E´ó
+            y1 = leftYStart<rightYStart?leftYStart:rightYStart;//Så°
+            y2 = leftYStart<rightYStart?rightYStart:leftYStart;//Så¤§
+            y3 = leftYEnd<rightYEnd?leftYEnd:rightYEnd;//Eå°
+            y4 = leftYEnd<rightYEnd?rightYEnd:leftYEnd;//Eå¤§
             divide = (double)(y4 - y2) / (y3 - y2);
             leadYStart = y1;
             leadYEnd = (y3 + y4) / 2;
@@ -771,7 +771,7 @@ void CalculateLeadLine()
           ////////////////////////
                 }
             }
-            for (int i = y2; i <= y3; i++)//¿´²»¶®£¬Ğ§¹ûÉÏÀ´Ëµ£¬Ã»ÎÊÌâ
+            for (int i = y2; i <= y3; i++)//çœ‹ä¸æ‡‚ï¼Œæ•ˆæœä¸Šæ¥è¯´ï¼Œæ²¡é—®é¢˜
             {
                 if (y4 == leftYEnd)
                 {
@@ -811,21 +811,28 @@ void CalculateLeadLine()
         }
     }
 }
-//ÉîËÑ ´Óx,yÎ»ÖÃ¿ªÊ¼µİ¹éÍùÏÂËÑ ÕÒµ½ËùÓĞÁ¬Í¨ÇøÓò
-//ËÑË÷Ë³ĞòÊÇÕıÉÏ¡¢×óÉÏ¡¢ÓÒÉÏ¡¢×ó¡¢ÓÒ¡¢×óÏÂ¡¢ÓÒÏÂ¡¢ÕıÏÂ 
-//×óÓÒÁ¬Í¨ÅĞ¶Ï ºÍ ÉÏÏÂÁ¬Í¨ÅĞ¶ÏÊÇ²»Í¬µÄ·½·¨
-void DFS(int x,int y)//Íê³É
+
+/*
+
+  å°†å›¾åƒä¸­å’Œæœ€ä¸‹æ–¹èµ›é“åŒºåŸŸç›¸è¿çš„ç™½è‰²åŒºåŸŸæ ‡è®°ä¸ºConGraph=1
+  å¯¹äºæ²¡æœ‰è¿é€šçš„ç™½è‰²åŒºåŸŸ è¯´æ˜æ˜¯å¹²æ‰°ï¼ˆéš”å£çš„èµ›é“ æˆ–è€…å…‰æ–‘ï¼‰
+  å¯ä»¥ä¹‹åäººä¸ºç½®é»‘
+*/
+//æ·±æœ ä»x,yä½ç½®å¼€å§‹é€’å½’å¾€ä¸‹æœ æ‰¾åˆ°æ‰€æœ‰è¿é€šåŒºåŸŸ
+//æœç´¢é¡ºåºæ˜¯æ­£ä¸Šã€å·¦ä¸Šã€å³ä¸Šã€å·¦ã€å³ã€å·¦ä¸‹ã€å³ä¸‹ã€æ­£ä¸‹ 
+//å·¦å³è¿é€šåˆ¤æ–­ å’Œ ä¸Šä¸‹è¿é€šåˆ¤æ–­æ˜¯ä¸åŒçš„æ–¹æ³•
+void DFS(int x,int y)//å®Œæˆ
 {
-    if (x<0 || x>=60 || y<0 || y>=20)return;//±ÜÃâ³ö½ç
-    if (ConGraph[x][y] != 0 ) return;//ÒÑ¾­ËÑË÷¹ı£¬Ìø³öµİ¹é
-    ConGraph[x][y] = 1;//±ê¼ÇÁ¬Í¨
+    if (x<0 || x>=60 || y<0 || y>=20)return;//é¿å…å‡ºç•Œ
+    if (ConGraph[x][y] != 0 ) return;//å·²ç»æœç´¢è¿‡ï¼Œè·³å‡ºé€’å½’
+    ConGraph[x][y] = 1;//æ ‡è®°è¿é€š
     IsConnect[x]=1;
-    if (x > 0)//ÍùÉÏ·½ËÑ 
+    if (x > 0)//å¾€ä¸Šæ–¹æœ 
     {
         if (ColConnect(img[x][y], img[x - 1][y]))
             DFS(x - 1, y);
     }
-    if (y > 0 )//×óÓÒËÑ
+    if (y > 0 )//å·¦å³æœ
     {
         if (RowConnect(img[x][y-1], img[x][y]))
             DFS(x, y - 1);
@@ -835,18 +842,18 @@ void DFS(int x,int y)//Íê³É
         if (RowConnect(img[x][y] , img[x][y + 1]))
             DFS(x, y + 1);
     }
-    if (x < 60-1)//ÍùÏÂËÑ
+    if (x < 60-1)//å¾€ä¸‹æœ
     {
         if (ColConnect(img[x][y], img[x + 1][y]))
             DFS(x + 1, y);
     }
 }
 
-//ÕÒÓÒÌø±äµã ´Ó°×±äÎ»ºÚ 0000 1111 ·µ»ØÌø±äµãÎ»ÖÃ
+//æ‰¾å³è·³å˜ç‚¹ ä»ç™½å˜ä½é»‘ 0000 1111 è¿”å›è·³å˜ç‚¹ä½ç½®
 int RightJump(unsigned char a)
 {
     int  i;
-    if (a >= 0x0f )//×ó±ß´æÔÚºÚµã ÔÚ×ó±ßÕÒÌø±ä
+    if (a >= 0x0f )//å·¦è¾¹å­˜åœ¨é»‘ç‚¹ åœ¨å·¦è¾¹æ‰¾è·³å˜
     {
         a >>= 4;
         for (i = 0; i < 4; i++)
@@ -855,7 +862,7 @@ int RightJump(unsigned char a)
         }
         i += 4;
     }
-    else {//ÓÒ±ßÕÒÌø±ä
+    else {//å³è¾¹æ‰¾è·³å˜
         for (i = 0; i < 4; i++)
         {
             if ((a&(1 << i)) == 0)break;
@@ -864,11 +871,11 @@ int RightJump(unsigned char a)
     return 8 - i;
 }
 
-//ÕÒ×óÌø±äµã  ´ÓºÚ±ä³É°× 1111 0000
+//æ‰¾å·¦è·³å˜ç‚¹  ä»é»‘å˜æˆç™½ 1111 0000
 int LeftJump(unsigned char a)
 {
     int i = 0;
-    if ((a & 0x0f) != 0x0f)//ÓÒ±ßËÄ¸ö²»¶¼ÊÇ1
+    if ((a & 0x0f) != 0x0f)//å³è¾¹å››ä¸ªä¸éƒ½æ˜¯1
     {
         for (i = 0; i < 4; i++)
         {
@@ -876,7 +883,7 @@ int LeftJump(unsigned char a)
         }
         i = 8 - i;
     }
-    else//ÔÚ×ó±ßËÄ¸öÕÒµ½Ìø±äµã
+    else//åœ¨å·¦è¾¹å››ä¸ªæ‰¾åˆ°è·³å˜ç‚¹
     {
         a >>= 4;
         for (i = 0; i < 4; i++)
@@ -887,8 +894,8 @@ int LeftJump(unsigned char a)
     }
     return i;
 }
-//µØÌºÊ½ËÑË÷ ÓÃÓÚÇ°ÈıĞĞ 
-//ÕÒµ½ÕâÒ»ĞĞÖĞ×î´óµÄÒ»¶Î°×ÏßµÄÖĞµã
+//åœ°æ¯¯å¼æœç´¢ ç”¨äºå‰ä¸‰è¡Œ 
+//æ‰¾åˆ°è¿™ä¸€è¡Œä¸­æœ€å¤§çš„ä¸€æ®µç™½çº¿çš„ä¸­ç‚¹
 int CarpetSearch(int row)
 {
     int ans;
@@ -897,12 +904,12 @@ int CarpetSearch(int row)
     int i,j;
     for (i = 0; i < 20; i++)
     {
-      if (img[row][i] != 0xff)//³öÏÖ°×µã
+      if (img[row][i] != 0xff)//å‡ºç°ç™½ç‚¹
       {
-        start = LeftJump(img[row][i])+i*8;//±ê¼ÇÆğµã
+        start = LeftJump(img[row][i])+i*8;//æ ‡è®°èµ·ç‚¹
         for (j = i+1; j < 20; j++)
         {
-          if (img[row][j] != 0x00)//³öÏÖºÚµã
+          if (img[row][j] != 0x00)//å‡ºç°é»‘ç‚¹
               break;
         }
         end = RightJump(img[row][j]) + j * 8;
@@ -918,12 +925,12 @@ int CarpetSearch(int row)
     return mid;
 }
 
-//È¥³ıÔëµã
+//å»é™¤å™ªç‚¹
 int RemoveNoise(int mode)
 { 
     if (mode == 1)
     {
-        //Ïß³¤ÅĞ¶Ï
+        //çº¿é•¿åˆ¤æ–­
         if (leftYEnd - leftYStart < MIN_LINE_LENGTH)
         {
             leftYStart = -1;
@@ -937,7 +944,7 @@ int RemoveNoise(int mode)
     }
     else if (mode == 2)
     {
-        //Ïß³¤ÅĞ¶Ï
+        //çº¿é•¿åˆ¤æ–­
         if (leftYEnd - leftYStart < MIN_CROSS_LENGTH)
         {
             leftYStart = -1;
@@ -946,7 +953,7 @@ int RemoveNoise(int mode)
         {
             rightYStart = -1;
         }
-        //ÂË³ı³¬¹ıÏßÉÏÏàÁÚÁ½µã×î´óºáÏò¾àÀëµÄÏß
+        //æ»¤é™¤è¶…è¿‡çº¿ä¸Šç›¸é‚»ä¸¤ç‚¹æœ€å¤§æ¨ªå‘è·ç¦»çš„çº¿
         for(int i=leftYStart;i<leftYEnd;i++)
         {
             int num=leftLine[i+1]-leftLine[i];
@@ -969,21 +976,21 @@ int RemoveNoise(int mode)
     return 1;
 }
 /*************************************************************************************/
-/***************************************Ê®×Ö½»²æÊ¶±ğ**********************************/
-//Ê®×Ö½»²æ×Üº¯Êı
+/***************************************åå­—äº¤å‰è¯†åˆ«**********************************/
+//åå­—äº¤å‰æ€»å‡½æ•°
 void CrossRecognize(uint8 *src,uint8 *pSrc)//P1 P2
 {
     int y2 = -1;
-    //Ğ±ÈëÊ®×ÖÅĞ¶Ï
-    //×óÏß
+    //æ–œå…¥åå­—åˆ¤æ–­
+    //å·¦çº¿
     if (leftYStart != -1)
     {
-        y2 = GetBiasDownRAngle(leftLine, leftYStart, leftYEnd);//ÅĞ¶ÏÊÇ·ñÊÇĞ±ÈëÊ®×Ö
-        if (y2 != -1)//ÊÇĞ±ÈëÊ®×Ö
+        y2 = GetBiasDownRAngle(leftLine, leftYStart, leftYEnd);//åˆ¤æ–­æ˜¯å¦æ˜¯æ–œå…¥åå­—
+        if (y2 != -1)//æ˜¯æ–œå…¥åå­—
         {
-            //Íê³É×óÏß Y2Îª×ªÕÛµã
+            //å®Œæˆå·¦çº¿ Y2ä¸ºè½¬æŠ˜ç‚¹
             float *ab = GetLSMatchingLine(leftLine, leftYStart, y2);
-            ab[1] += WIDTH / 2;//Æ½ÒÆ
+            ab[1] += WIDTH / 2;//å¹³ç§»
             int *lys = ReverseSearchLine(pSrc, leftLine, leftYStart, ab[0], ab[1], 1);
             if (lys[0] != -1 && lys[1] != -1)
             {
@@ -994,7 +1001,7 @@ void CrossRecognize(uint8 *src,uint8 *pSrc)//P1 P2
             {
                 leftYEnd = y2;
             }
-            //¼æ¼ÃÓÒÏß
+            //å…¼æµå³çº¿
             if (rightYStart != -1)
             {
                 int *rys = ReverseSearchLine(pSrc, rightLine, rightYEnd, ab[0], ab[1], 2);
@@ -1008,13 +1015,13 @@ void CrossRecognize(uint8 *src,uint8 *pSrc)//P1 P2
             return;
         }
     }
-    //ÓÒÏß
+    //å³çº¿
     if (y2 == -1 && rightYStart != -1)
     {
         y2 = GetBiasDownRAngle(rightLine, rightYStart, rightYEnd);
         if (y2 != -1)
         {
-            //Íê³ÉÓÒÏß
+            //å®Œæˆå³çº¿
             float *ab = GetLSMatchingLine(rightLine, rightYStart, y2);
             ab[1] -= WIDTH / 2;
             int *rys = ReverseSearchLine(pSrc, rightLine, rightYStart, ab[0], ab[1], 2);
@@ -1027,7 +1034,7 @@ void CrossRecognize(uint8 *src,uint8 *pSrc)//P1 P2
             {
                 rightYEnd = y2;
             }
-            //¼æ¼Ã×óÏß
+            //å…¼æµå·¦çº¿
             if (leftYStart != -1)
             {
                 int *lys = ReverseSearchLine(pSrc, leftLine, leftYEnd, ab[0], ab[1], 1);
@@ -1042,9 +1049,9 @@ void CrossRecognize(uint8 *src,uint8 *pSrc)//P1 P2
         }
     }
 	
-    //Ö±ÈëÊ®×ÖÅĞ¶Ï
+    //ç›´å…¥åå­—åˆ¤æ–­
     int lt, ly2 = -1, ry2 = -1;
-    //×óÏß
+    //å·¦çº¿
     if (leftYStart != -1)
     {
         ly2 = GetStraightDownRAngle(src, leftLine, leftYStart, leftYEnd, 1);
@@ -1075,7 +1082,7 @@ void CrossRecognize(uint8 *src,uint8 *pSrc)//P1 P2
             {
                 leftYEnd = ly2;
             }
-            //¼æ¼ÃÓÒÏß
+            //å…¼æµå³çº¿
             if (rightYStart != -1)
             {
                 ry2 = GetStraightDownRAngle(src, rightLine, rightYStart, rightYEnd, 2);
@@ -1094,7 +1101,7 @@ void CrossRecognize(uint8 *src,uint8 *pSrc)//P1 P2
             return;
         }
     }
-    //ÓÒÏß
+    //å³çº¿
     if (ly2 == -1 && rightYStart != -1)
     {
         ry2 = GetStraightDownRAngle(src, rightLine, rightYStart, rightYEnd, 2);
@@ -1125,7 +1132,7 @@ void CrossRecognize(uint8 *src,uint8 *pSrc)//P1 P2
             {
                 rightYEnd = ry2;
             }
-            //¼æ¼Ã×óÏß
+            //å…¼æµå·¦çº¿
             if (leftYStart != -1)
             {
                 ly2 = GetStraightDownRAngle(src, leftLine, leftYStart, leftYEnd, 1);
@@ -1146,12 +1153,12 @@ void CrossRecognize(uint8 *src,uint8 *pSrc)//P1 P2
     }
 }
 
-//Ğ±ÈëÊ®×ÖÈ·¶¨ÏÂÖ±½Ç
+//æ–œå…¥åå­—ç¡®å®šä¸‹ç›´è§’
 int GetBiasDownRAngle(int line[], int start, int end)//leftLine, leftYStart, leftYEnd
 {
-    //1Îª´ÓÏÂÏòÉÏ,-1Îª´ÓÉÏÏòÏÂ
+    //1ä¸ºä»ä¸‹å‘ä¸Š,-1ä¸ºä»ä¸Šå‘ä¸‹
     int m1, m2, mul;
-    //Ö±½Ç¼ì²â(Ğ±ÈëÊ®×Ö)
+    //ç›´è§’æ£€æµ‹(æ–œå…¥åå­—)
     for (int i = start + CROSS_LENGTH; i <= end - CROSS_LENGTH; i++)
     {
         m1 = line[i] - line[i - CROSS_LENGTH];
@@ -1159,7 +1166,7 @@ int GetBiasDownRAngle(int line[], int start, int end)//leftLine, leftYStart, lef
         mul = m1 * m2;
         if (mul < -CROSS_LENGTH * CROSS_LENGTH)
         {
-            //Ğ±ÈëÊ®×Ö,×ªÕÛµãºóÇåÁã
+            //æ–œå…¥åå­—,è½¬æŠ˜ç‚¹åæ¸…é›¶
             for (int j = i + 1; j <= end; j++)
             {
                 line[j] = 0;
@@ -1171,12 +1178,12 @@ int GetBiasDownRAngle(int line[], int start, int end)//leftLine, leftYStart, lef
     return -1;
 }
 
-//Ğ±ÈëÊ®×ÖÈ·¶¨ÉÏÖ±½Ç
+//æ–œå…¥åå­—ç¡®å®šä¸Šç›´è§’
 int GetBiasUpRAngle(int line[], int start, int end)
 {
-    //1Îª´ÓÏÂÏòÉÏ,-1Îª´ÓÉÏÏòÏÂ
+    //1ä¸ºä»ä¸‹å‘ä¸Š,-1ä¸ºä»ä¸Šå‘ä¸‹
     int m1, m2, mul;
-    //Ö±½Ç¼ì²â(Ğ±ÈëÊ®×Ö)
+    //ç›´è§’æ£€æµ‹(æ–œå…¥åå­—)
     for (int i = end - CROSS_LENGTH; i >= start + CROSS_LENGTH; i--)
     {
         m1 = line[i] - line[i - CROSS_LENGTH];
@@ -1184,7 +1191,7 @@ int GetBiasUpRAngle(int line[], int start, int end)
         mul = m1 * m2;
         if (mul < -CROSS_LENGTH * CROSS_LENGTH)
         {
-            //Ğ±ÈëÊ®×Ö
+            //æ–œå…¥åå­—
             for (int j = i - 1; j >= start; j--)
             {
                 line[j] = 0;
@@ -1195,27 +1202,27 @@ int GetBiasUpRAngle(int line[], int start, int end)
     return -1;
 }
 
-//¼ÆËã×îĞ¡¶ş³ËÄâºÏÖ±Ïß
+//è®¡ç®—æœ€å°äºŒä¹˜æ‹Ÿåˆç›´çº¿
 float ls[2];
 float *GetLSMatchingLine(int line[], int start, int end)//leftLine, leftYStart, y2
 {
-    int h1, sum1, sum2, sum3, sum4;//×îĞ¡¶ş³Ë·¨¼ÆËã
-    //×îĞ¡¶ş³Ë·¨ÄâºÏ(ºáY×İX)XÎª×¼È·Öµ£¬YÎª²âÁ¿Öµ
+    int h1, sum1, sum2, sum3, sum4;//æœ€å°äºŒä¹˜æ³•è®¡ç®—
+    //æœ€å°äºŒä¹˜æ³•æ‹Ÿåˆ(æ¨ªYçºµX)Xä¸ºå‡†ç¡®å€¼ï¼ŒYä¸ºæµ‹é‡å€¼
     sum1 = 0; sum2 = 0; sum3 = 0; sum4 = 0;
     h1 = end - start + 1;
     for (int i = start; i <= end; i++)
     {
-        sum1 += line[i];//yÇóºÍ
-        sum2 += PROW - 1 - i;//xÇóºÍ
-        sum3 += (PROW - 1 - i) * line[i];//x*yÇóºÍ
-        sum4 += (PROW - 1 - i) * (PROW - 1 - i);//x^2ÇóºÍ
+        sum1 += line[i];//yæ±‚å’Œ
+        sum2 += PROW - 1 - i;//xæ±‚å’Œ
+        sum3 += (PROW - 1 - i) * line[i];//x*yæ±‚å’Œ
+        sum4 += (PROW - 1 - i) * (PROW - 1 - i);//x^2æ±‚å’Œ
     }
     ls[0] = (float)(h1 * sum3 - sum1 * sum2) / (h1 * sum4 - sum2 * sum2);//a
     ls[1] = (float)(sum1 / h1 - ls[0] * ((float)sum2 / h1));//b
     return ls;
 }
 
-//ÅĞ¶ÏÏß¶ÎÀàĞÍ
+//åˆ¤æ–­çº¿æ®µç±»å‹
 float MAX_STRAIGHT_AREA = 1.01;
 int JudgeLineType(int line[], int start, int end)
 {
@@ -1228,7 +1235,7 @@ int JudgeLineType(int line[], int start, int end)
         dis = (float)(fabs(a * (PROW - 1 - i) - line[i] + b) / sqrt(a * a + 1));
         sum += dis;
     }
-    //Ö±Ïß·µ»Ø1¶øÇúÏß·µ»Ø2
+    //ç›´çº¿è¿”å›1è€Œæ›²çº¿è¿”å›2
     avDis=sum / (end - start + 1);
     if (avDis <= MAX_STRAIGHT_AREA)
     {
@@ -1240,7 +1247,7 @@ int JudgeLineType(int line[], int start, int end)
     }
 }
 
-//·´ÏòË«±ßÑ°Ïß
+//åå‘åŒè¾¹å¯»çº¿
 int ys[2];
 int MIN_CON_POINT=5;
 int *ReverseSearchLine(uint8 *pSrc, int line[], int start, float a, float b, int direction)
@@ -1249,28 +1256,28 @@ int *ReverseSearchLine(uint8 *pSrc, int line[], int start, float a, float b, int
     int midTrue, midX, num, lastX = 0, conCnt = 0, lost = 0;
     ys[0]=-1;
     ys[1]=-1;
-    //×ó±ßÑ°Ïß
+    //å·¦è¾¹å¯»çº¿
     if (direction == 1)
     {
         conCnt = 0;
         lost = 0;
-        //Ö±½Ó±ßÔµ
+        //ç›´æ¥è¾¹ç¼˜
         for (int i = PROW - 1; i > start + 5; i--)
         {
             midTrue = (int)(a * (PROW - 1 - i) + b);
             midX = midTrue;
             if (midX > rightEdge[PROW - 1 - i]) { midX = rightEdge[PROW - 1 - i]; }
             if (midX < leftEdge[PROW - 1 - i]) { midX = leftEdge[PROW - 1 - i]; }
-            for (int j = midX; j > 0; j--)//´ÓÖĞ¼äÏò×ó±ßÉ¨Ãè
+            for (int j = midX; j > 0; j--)//ä»ä¸­é—´å‘å·¦è¾¹æ‰«æ
             {
                 num = *(pSrc+(PROW - 1 - i)*PCOLUMN+j);
-                if (num == 1)//ÓĞÌø±äµã
+                if (num == 1)//æœ‰è·³å˜ç‚¹
                 {
                     if (midTrue - j > WIDTH / 2 + 10)
                     {
                         break;
                     }
-					//JÂú×ãÌõ¼ş£¬
+					//Jæ»¡è¶³æ¡ä»¶ï¼Œ
                     lost = 0;
                     if (ys[1] == -1) { lastX = j; }
                     if (conCnt < MIN_CON_POINT)
@@ -1298,7 +1305,7 @@ int *ReverseSearchLine(uint8 *pSrc, int line[], int start, float a, float b, int
     {
         conCnt = 0;
         lost = 0;
-        //Ö±½Ó±ßÔµ
+        //ç›´æ¥è¾¹ç¼˜
         for (int i = PROW - 1; i > start + 5; i--)
         {
             midTrue = (int)(a * (PROW - 1 - i) + b);
@@ -1339,12 +1346,12 @@ int *ReverseSearchLine(uint8 *pSrc, int line[], int start, float a, float b, int
     return ys;
 }
 
-//Ö±ÈëÊ®×ÖÈ·¶¨ÏÂÖ±½Ç
+//ç›´å…¥åå­—ç¡®å®šä¸‹ç›´è§’
 int MAX_HORLINE_LENGTH = 15;
 int GetStraightDownRAngle(uint8 *src, int line[], int start, int end, int direction)
 {
     int pn=0,st=0;
-    //×óÏß
+    //å·¦çº¿
     if (direction == 1)
     {
         if(end-start<=2){st=start+1;}
@@ -1365,12 +1372,12 @@ int GetStraightDownRAngle(uint8 *src, int line[], int start, int end, int direct
             }
             if (pn > MAX_HORLINE_LENGTH)
             {
-                //Ö±ÈëÊ®×Ö
+                //ç›´å…¥åå­—
                 return i - 1;
             }
         }
     }
-    //ÓÒÏß
+    //å³çº¿
     else if (direction == 2)
     {
         if(end-start<=2){st=start+1;}
@@ -1391,7 +1398,7 @@ int GetStraightDownRAngle(uint8 *src, int line[], int start, int end, int direct
             }
             if (pn > MAX_HORLINE_LENGTH)
             {
-                //Ö±ÈëÊ®×Ö
+                //ç›´å…¥åå­—
                 return i - 1;
             }
         }
@@ -1399,11 +1406,11 @@ int GetStraightDownRAngle(uint8 *src, int line[], int start, int end, int direct
     return -1;
 }
 
-//Ö±ÈëÊ®×ÖÈ·¶¨ÉÏÖ±½Ç
+//ç›´å…¥åå­—ç¡®å®šä¸Šç›´è§’
 int GetStraightUpRAngle(uint8 *src, int line[], int start, int end, int direction)
 {
     int pn=0,st=0;
-    //×óÏß
+    //å·¦çº¿
     if (direction == 1)
     {
         if(end-start<=2){st=end-1;}
@@ -1424,7 +1431,7 @@ int GetStraightUpRAngle(uint8 *src, int line[], int start, int end, int directio
             }
             if (pn > MAX_HORLINE_LENGTH)
             {
-                //Ö±ÈëÊ®×Ö
+                //ç›´å…¥åå­—
                 for (int j = i; j >= start; j--)
                 {
                     line[j] = 0;
@@ -1433,7 +1440,7 @@ int GetStraightUpRAngle(uint8 *src, int line[], int start, int end, int directio
             }
         }
     }
-    //ÓÒÏß
+    //å³çº¿
     else if (direction == 2)
     {
         if(end-start<=2){st=end-1;}
@@ -1454,7 +1461,7 @@ int GetStraightUpRAngle(uint8 *src, int line[], int start, int end, int directio
             }
             if (pn > MAX_HORLINE_LENGTH)
             {
-                //Ö±ÈëÊ®×Ö
+                //ç›´å…¥åå­—
                 for (int j = i; j >= start; j--)
                 {
                     line[j] = 0;
@@ -1466,12 +1473,12 @@ int GetStraightUpRAngle(uint8 *src, int line[], int start, int end, int directio
     return -1;
 }
 
-//Ê®×Ö½»²æ²¹Ïß
+//åå­—äº¤å‰è¡¥çº¿
 void CrossMakeUpLine(int line[], int start, int end)
 {
     int i, j, num, y1 = 0, y2 = 0, t1, t2;
     double slope;
-    //¶Ô²»ÊÇ0µÄÉÏÏÂÁ½µã°´Ğ±ÂÊ²¹Ïß
+    //å¯¹ä¸æ˜¯0çš„ä¸Šä¸‹ä¸¤ç‚¹æŒ‰æ–œç‡è¡¥çº¿
     for (i = start; i <= end; i++)
     {
         num = line[i];
@@ -1498,7 +1505,7 @@ void CrossMakeUpLine(int line[], int start, int end)
     }
 }
 /*********************/
-//¼ÆËãÇúÂÊ1
+//è®¡ç®—æ›²ç‡1
   int A,C,BC,AB,T;
   float X;
 float CuvreControl(int start,int end)
@@ -1518,7 +1525,7 @@ float CuvreControl(int start,int end)
   X=(float)2.0*BC/(float)(AB*AB+BC*BC);
   return X;
 }
-//»·ĞÎÍäµÄ´¦Àí
+//ç¯å½¢å¼¯çš„å¤„ç†
 void HuangXing(void)
 {int i,j,num=0,sum=0;
   for(i=59;i>20;i--)
@@ -1563,7 +1570,7 @@ int GetStraightDownRAngle_2(uint8 *src, int line[], int start, int end, int dire
 	//P2 leftLine, leftYStart, leftYEnd, 1
 {
     int pn=0,st=0;
-    //×óÏß
+    //å·¦çº¿
     if (direction == 1)
     {
         if(end-start<=2){st=start+1;}
@@ -1573,7 +1580,7 @@ int GetStraightDownRAngle_2(uint8 *src, int line[], int start, int end, int dire
             pn = 0;
             for (int j = line[end]; j < HEART; j++)
             {
-                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//ÎŞÌø±ä
+                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//æ— è·³å˜
                 {
 					pn++;
                 }
@@ -1591,7 +1598,7 @@ int GetStraightDownRAngle_2(uint8 *src, int line[], int start, int end, int dire
             }
         }
     }
-    //ÓÒÏß
+    //å³çº¿
     else if (direction == 2)
     {
         if(end-start<=2){st=start+1;}
@@ -1601,7 +1608,7 @@ int GetStraightDownRAngle_2(uint8 *src, int line[], int start, int end, int dire
             pn = 0;
             for (int j = line[end]; j > HEART; j--)
             {
-                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//ÎŞÌø±ä
+                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//æ— è·³å˜
                 {
 					pn++;
                 }
@@ -1627,7 +1634,7 @@ int GetStraightDownRAngle_1(uint8 *src, int line[], int start, int end, int dire
 	//P2 leftLine, leftYStart, leftYEnd, 1
 {
     int pn=0,st=0;
-    //×óÏß
+    //å·¦çº¿
     if (direction == 1)
     {
         if(end-start<=2){st=start+1;}
@@ -1637,7 +1644,7 @@ int GetStraightDownRAngle_1(uint8 *src, int line[], int start, int end, int dire
             pn = 0;
             for (int j = line[end]; j < HEART; j++)
             {
-                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//ÎŞÌø±ä
+                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//æ— è·³å˜
                 {
 					pn++;
                 }
@@ -1655,7 +1662,7 @@ int GetStraightDownRAngle_1(uint8 *src, int line[], int start, int end, int dire
             }
         }
     }
-    //ÓÒÏß
+    //å³çº¿
     else if (direction == 2)
     {
         if(end-start<=2){st=start+1;}
@@ -1665,7 +1672,7 @@ int GetStraightDownRAngle_1(uint8 *src, int line[], int start, int end, int dire
             pn = 0;
             for (int j = line[end]; j > HEART; j--)
             {
-                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//ÎŞÌø±ä
+                if (*(src+(PROW - 1 - i)*PCOLUMN+j) == 0)//æ— è·³å˜
                 {
 					pn++;
                 }
@@ -1686,12 +1693,12 @@ int GetStraightDownRAngle_1(uint8 *src, int line[], int start, int end, int dire
     return -1;
 }
 
-//*************ÅĞ¶ÏÊ®×Ö»ò»·ĞÎ**************/
-//    0ÎªÖ±ÏßÈë»·
-//    1ÎªÖ±ÏßÈëÊ®×Ö
-//    2ÎªĞ±Èë»·
-//    3ÎªĞ±ÈëÊ®×Ö
-//    -1Îª¾ù²»ÊÇ
+//*************åˆ¤æ–­åå­—æˆ–ç¯å½¢**************/
+//    0ä¸ºç›´çº¿å…¥ç¯
+//    1ä¸ºç›´çº¿å…¥åå­—
+//    2ä¸ºæ–œå…¥ç¯
+//    3ä¸ºæ–œå…¥åå­—
+//    -1ä¸ºå‡ä¸æ˜¯
 int Crossorring(uint8 *src,uint8 *pSrc)
 {
 	
@@ -1702,7 +1709,7 @@ int Crossorring(uint8 *src,uint8 *pSrc)
 	int Linemid;
 	int  ly2 = -1, ry2 = -1;
 	int endmix,endmax,startmix,startmax;
-	//Ö±Èë
+	//ç›´å…¥
 	if (leftYStart != -1&&rightYStart != -1)
         {
         //ly2 = GetStraightDownRAngle(src, leftLine, leftYStart, leftYEnd, 1);
@@ -1736,7 +1743,7 @@ int Crossorring(uint8 *src,uint8 *pSrc)
                 ly1 = GetStraightDownRAngle_1(src, leftLine, leftYStart, leftYEnd, 1);
 		ry1 = GetStraightDownRAngle_1(src, rightLine, rightYStart, rightYEnd, 2);
 		
-		if ((ly2 != -1 && ry2 != -1)||(ly1 != -1 && ry1 != -1))//´æÔÚÏÂÖ±½Ç
+		if ((ly2 != -1 && ry2 != -1)||(ly1 != -1 && ry1 != -1))//å­˜åœ¨ä¸‹ç›´è§’
 		{
 			for(i=startmax;i<=endmix-3;i++)
 			{
@@ -1754,14 +1761,14 @@ int Crossorring(uint8 *src,uint8 *pSrc)
 				for(i=Linemid-3;i<Linemid+3;i++)
 				{
 					num = *(src+(PROW - 1 - endmix-k)*PCOLUMN+i);
-					if(num == 0)//ÓĞÌø±ä
+					if(num == 0)//æœ‰è·³å˜
 					{sum++;}
-					if(sum>=10)return 0;//Ö±ÈëÔ²»·
+					if(sum>=10)return 0;//ç›´å…¥åœ†ç¯
 				}
 			}
 			if((endmax!=PROW - 1)&&(sum<3))
 			{
-				return 1;//Ö±ÈëÖ±½Ç
+				return 1;//ç›´å…¥ç›´è§’
 			}
 		}	
         }
@@ -1811,11 +1818,11 @@ int CarpetSearch2(int row,int *WLength,int *BLength,int *WMid)
     return num;
 }
 
-//ÕÏ°­´¦Àí 
-int ZebraLineFlag=0;//ÆğÅÜÏß±êÖ¾Î»
-int BlockFlag=0;//ÕÏ°­±ê¼ÇÎ»
+//éšœç¢å¤„ç† 
+int ZebraLineFlag=0;//èµ·è·‘çº¿æ ‡å¿—ä½
+int BlockFlag=0;//éšœç¢æ ‡è®°ä½
 
-int JudgeMode=0;//ÅĞ¶¨½á¹û
+int JudgeMode=0;//åˆ¤å®šç»“æœ
 int lineNum[30];
 int WLength[30][10];
 int BLength[30][10];
@@ -1827,26 +1834,26 @@ void Block_Judge(void)
     ZebraLineFlag=0;
     BlockFlag=0;
     
-    memset(lineNum,0,sizeof(lineNum));//ÇåÁã
+    memset(lineNum,0,sizeof(lineNum));//æ¸…é›¶
     memset(WLength,0,sizeof(WLength));
     memset(BLength,0,sizeof(BLength));
     memset(WMid,0,sizeof(WMid));
-    for(int i=25;i<55;i++)//´Óµ¹ÊıµÚÊ®ĞĞ²É¼¯ ²É¼¯30ĞĞ
+    for(int i=25;i<55;i++)//ä»å€’æ•°ç¬¬åè¡Œé‡‡é›† é‡‡é›†30è¡Œ
     {
         t=i-25;
         lineNum[t]=CarpetSearch2(i,WLength[t],BLength[t],WMid[t]);
-        if(lineNum[t]>=4)//ÆğÅÜÏßÅĞ¶¨ÊıÁ¿
+        if(lineNum[t]>=4)//èµ·è·‘çº¿åˆ¤å®šæ•°é‡
           ZebraLineFlag++;
-        else if(lineNum[t]==2)//Á½¶Î°×Ïß ¿ÉÄÜÊÇÈë»· ¡¢Èë»· »òÕßÕÏ°­Îï
+        else if(lineNum[t]==2)//ä¸¤æ®µç™½çº¿ å¯èƒ½æ˜¯å…¥ç¯ ã€å…¥ç¯ æˆ–è€…éšœç¢ç‰©
         {
            if((WLength[t][0]-WLength[t][1])>20)BlockFlag++;
            else if((WLength[t][1]-WLength[t][0])>20)BlockFlag--;
         }
     }
   //  led (LED0,LED_ON);
-    if(BlockFlag>12)JudgeMode=1;//ÓÒ±ßÂ·ÕÏ
-      else if(BlockFlag<-12)JudgeMode=2;//×ó±ßÂ·ÕÏ
-      else if(ZebraLineFlag>9)JudgeMode=4;//ÆğÅÜÏß
+    if(BlockFlag>12)JudgeMode=1;//å³è¾¹è·¯éšœ
+      else if(BlockFlag<-12)JudgeMode=2;//å·¦è¾¹è·¯éšœ
+      else if(ZebraLineFlag>9)JudgeMode=4;//èµ·è·‘çº¿
       else {
         JudgeMode=0;
         
@@ -1854,26 +1861,26 @@ void Block_Judge(void)
 }
 
 int JudgeCounter=0;
-//Í¼Ïñ´¦ÀíËã·¨
+//å›¾åƒå¤„ç†ç®—æ³•
 /***********************************/
 uint8 tr,staticTr;
-void imageProcess(uint8 *src)//srcĞ£ÕıºóµÄÍ¼Ïñ
+void imageProcess(uint8 *src)//srcæ ¡æ­£åçš„å›¾åƒ
 {
         int8 re;
         uint8 i;
         
         int test[5];       
 
-        //Ñ°Ë«Ïß
-        RecordBWChange (src,p2);//¼ÇÂ¼Ìø±äÑØ
+        //å¯»åŒçº¿
+        RecordBWChange (src,p2);//è®°å½•è·³å˜æ²¿
 
         
-        re=SearchBaseLines(p2);//Ñ°Ë«Ïß
+        re=SearchBaseLines(p2);//å¯»åŒçº¿
         CrossRecognize(p1,p2);
         
         //xyz=Crossorring(p1,p2);
-        CalculateLeadLine();//¼ÆËãÒıµ¼Ïß 
-        ///////´¦Àí»·ĞÎÍä
+        CalculateLeadLine();//è®¡ç®—å¼•å¯¼çº¿ 
+        ///////å¤„ç†ç¯å½¢å¼¯
         huan_sign=judgebigring(20);
         if(huan_sign<20&&huan_sign>15)
         {  
@@ -1882,7 +1889,7 @@ void imageProcess(uint8 *src)//srcĞ£ÕıºóµÄÍ¼Ïñ
               leadLine[i]=leftEdge[i]+WIDTH / 3;    
         }
         
-       ////////´¦ÀíÕÏ°­
+       ////////å¤„ç†éšœç¢
         led (LED0,LED_OFF);
         led (LED1,LED_OFF);
         if(JudgeCounter==0)
@@ -1896,55 +1903,55 @@ void imageProcess(uint8 *src)//srcĞ£ÕıºóµÄÍ¼Ïñ
                   leadLine[i]=80;   
                 }
              }
-            else if(JudgeMode==1)//ÓÒ±ßÕÏ°­
+            else if(JudgeMode==1)//å³è¾¹éšœç¢
             {
               led (LED0,LED_ON);
                 JudgeCounter=35;
                 for(int i=0;i<20;i++)
                 {
                   if(leftLine[i]!=0)
-                  leadLine[i]=leftLine[i]+WIDTH / 4-1;   
+                  leadLine[i]=leftLine[i]+WIDTH / 4;   
                 }
             }
-            else if(JudgeMode==2)//×ó±ßÕÏ°­
+            else if(JudgeMode==2)//å·¦è¾¹éšœç¢
             {
               led (LED0,LED_ON);
               JudgeCounter=35;
               for(int i=0;i<20;i++)
               {
                 if(rightLine[i]!=0)
-                leadLine[i]=rightLine[i]-WIDTH / 4+1;  
+                leadLine[i]=rightLine[i]-WIDTH / 4;  
               }
             }
         }
-        //±£³ÖÒ»¶ÎÊ±¼ä
+        //ä¿æŒä¸€æ®µæ—¶é—´
         else{
           led (LED0,LED_ON);
-          if(JudgeMode==1)//ÓÒ±ßÕÏ°­
+          if(JudgeMode==1)//å³è¾¹éšœç¢
           {
             for(int i=0;i<20;i++)
                 {
                   if(leftLine[i]!=0)
-                  leadLine[i]=leftLine[i]+WIDTH / 4-1;   
+                  leadLine[i]=leftLine[i]+WIDTH / 4;   
                 }  
           }
-          else if(JudgeMode==2)//×ó±ßÕÏ°­
+          else if(JudgeMode==2)//å·¦è¾¹éšœç¢
           {
             for(int i=0;i<20;i++)
               {
                 if(rightLine[i]!=0)
-                leadLine[i]=rightLine[i]-WIDTH / 4+1;  
+                leadLine[i]=rightLine[i]-WIDTH / 4;  
               }
           } 
           JudgeCounter--;
         }
         
-        //////////////////////ÇúÏßÄâºÏ///////////////////////////
+        //////////////////////æ›²çº¿æ‹Ÿåˆ///////////////////////////
         leadlength=leadYEnd-leadYStart;
         Cuvre[0]=CuvreControl(leadYStart+leadlength*2/3,leadYEnd);
         Cuvre[1]=CuvreControl(leadYStart+leadlength/3,leadYStart+leadlength*2/3-1);
         Cuvre[2]=CuvreControl(leadYStart,leadYEnd);
-        midpoint_before=AAGAFilter(leadLine);//¼ÓÈ¨Æ½¾ùÂË²¨
+        midpoint_before=AAGAFilter(leadLine);//åŠ æƒå¹³å‡æ»¤æ³¢
         // midpoint_before=zwzfilter(leadlength);
        
         if(abs(midpoint_before-midpoint_before_E)>30)
@@ -2013,18 +2020,18 @@ void Crossorring_huanxing(void)
     }  
 
 }
-///////////ÅĞ¶Ï´óÔ²»·£¬ÓĞÈ«ºÚµÄĞĞÊı
+///////////åˆ¤æ–­å¤§åœ†ç¯ï¼Œæœ‰å…¨é»‘çš„è¡Œæ•°
 ////////
-////  black_hang_up  :´ÓÏÂÃæÕÒµ½µÄµÚÒ»ĞĞÈ«ºÚÉÏÃæµÚblack_hangÏòÏÂÕÒÎåĞĞ£¬ÓĞËÄĞĞÈ«ºÚÔòÅĞ¶ÏÎª»·ĞÎ
+////  black_hang_up  :ä»ä¸‹é¢æ‰¾åˆ°çš„ç¬¬ä¸€è¡Œå…¨é»‘ä¸Šé¢ç¬¬black_hangå‘ä¸‹æ‰¾äº”è¡Œï¼Œæœ‰å››è¡Œå…¨é»‘åˆ™åˆ¤æ–­ä¸ºç¯å½¢
 int judgebigring(int black_hang_up)
 {
 	int plot_black_L=0,plot_white_L=0,all_black=0,all_white=0,parts_black=0,wide_hang=0,black_hang=0,i;
         int plot_black_R=0,plot_white_R=0,all_black_hang=0;   
         int plot_sign;
-        //¼ÓÅĞ¶ÏÌõ¼ş£¬½ÚÔ¼Ê±¼ä  ×î¶¥ĞĞÎªÈ«ºÚ£¬×îµÍĞĞÎªÈ«°×
+        //åŠ åˆ¤æ–­æ¡ä»¶ï¼ŒèŠ‚çº¦æ—¶é—´  æœ€é¡¶è¡Œä¸ºå…¨é»‘ï¼Œæœ€ä½è¡Œä¸ºå…¨ç™½
         for(uint8 y=leftEdge[1]+1;y<rightEdge[1]-1; y++)
         {         
-          if (processBuf1[1][y]==255)//0ÊÇºÚ£¬255°× 
+          if (processBuf1[1][y]==255)//0æ˜¯é»‘ï¼Œ255ç™½ 
             {
               plot_sign++;
               if(plot_sign>4)
@@ -2033,7 +2040,7 @@ int judgebigring(int black_hang_up)
         }
         for(uint8 y=leftEdge[58]+1;y<rightEdge[58]-1; y++)
         {         
-          if (processBuf1[58][y]==0)//0ÊÇºÚ£¬255°× 
+          if (processBuf1[58][y]==0)//0æ˜¯é»‘ï¼Œ255ç™½ 
           {
                plot_sign++;
             if(plot_sign>4)
@@ -2042,12 +2049,12 @@ int judgebigring(int black_hang_up)
         }
        //////////////////////////////////////////
         
-	for (i = 0; i < PROW-10; i++)//Ã¿Ò»ĞĞ
+	for (i = 0; i < PROW-10; i++)//æ¯ä¸€è¡Œ
     {
          wide_hang=rightEdge[PROW-1-i]-leftEdge[PROW-1-i]-3;
         for (uint8 l = HEART,r=HEART;l>leftEdge[PROW-1-i]+1,r<rightEdge[PROW-1-i]-1; l--,r++)
         {      
-          if (processBuf1[PROW-1-i][HEART]==0)//0ÊÇºÚ£¬255°× 
+          if (processBuf1[PROW-1-i][HEART]==0)//0æ˜¯é»‘ï¼Œ255ç™½ 
           {
             if (processBuf1[PROW-1-i][l]==0)
            {
@@ -2070,7 +2077,7 @@ int judgebigring(int black_hang_up)
           }
            else
              break;
-          if(((plot_black_L+plot_black_R)>=wide_hang/4)&&(plot_white_L>=2)&&(plot_white_R>=2))   ////ÖĞ¼ä³öÏÖºÚÉ«£¬Á½±ßÊÇ°×É«
+          if(((plot_black_L+plot_black_R)>=wide_hang/4)&&(plot_white_L>=2)&&(plot_white_R>=2))   ////ä¸­é—´å‡ºç°é»‘è‰²ï¼Œä¸¤è¾¹æ˜¯ç™½è‰²
            {
            parts_black++;
             }
@@ -2078,7 +2085,7 @@ int judgebigring(int black_hang_up)
            {
             all_black++;
            if(parts_black>=3)
-           {black_hang=i;    //³öÏÖÈ«ºÚµÄĞĞÊı
+           {black_hang=i;    //å‡ºç°å…¨é»‘çš„è¡Œæ•°
             break;
             }
            
@@ -2091,7 +2098,7 @@ int judgebigring(int black_hang_up)
            if(black_hang==i&&i!=0)
              break;                   
         }
-        ///////////////////////////////ÉÏÃæÊÇÕÒÖĞ¼äºÚ£¬Á½±ß°× £¬ÏÂÃæÊÇÂú×ãÉÏÃæÌõ¼şºó£¬¼ìÑéÉÏÃæ black_hangĞĞÊÇ²»ÊÇ´æÔÚ¼¸ĞĞÈ«ºÚ
+        ///////////////////////////////ä¸Šé¢æ˜¯æ‰¾ä¸­é—´é»‘ï¼Œä¸¤è¾¹ç™½ ï¼Œä¸‹é¢æ˜¯æ»¡è¶³ä¸Šé¢æ¡ä»¶åï¼Œæ£€éªŒä¸Šé¢ black_hangè¡Œæ˜¯ä¸æ˜¯å­˜åœ¨å‡ è¡Œå…¨é»‘
         if(black_hang==i&&i!=0)
      {
          int black_all=0,plot_black=0,all_black_hang=0; 
@@ -2106,7 +2113,7 @@ int judgebigring(int black_hang_up)
            {
                  black_all++;                                 
            }
-           if(processBuf1[PROW-1-j][r]==0)//0ÊÇºÚ£¬255°× )
+           if(processBuf1[PROW-1-j][r]==0)//0æ˜¯é»‘ï¼Œ255ç™½ )
            {
              black_all++;
            }
@@ -2155,6 +2162,12 @@ void LCD_line_display(Site_t site)
     }
     for(site.y=rightYEnd+60;site.y>=rightYStart+60;(site.y)--)
     {
+        site.x=*(rightLine+PROW-site.y+60);
+        site.x=site.x*0.8;
+        LCD_point(site, BLUE);
+    }
+}
+
         site.x=*(rightLine+PROW-site.y+60);
         site.x=site.x*0.8;
         LCD_point(site, BLUE);
